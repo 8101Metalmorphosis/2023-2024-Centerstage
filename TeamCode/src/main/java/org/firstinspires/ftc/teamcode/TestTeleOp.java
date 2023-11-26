@@ -16,9 +16,9 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.FTCutil.MathUtil;
-import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 import org.firstinspires.ftc.teamcode.FTCutil.ButtonToggle;
 import org.firstinspires.ftc.teamcode.FTCutil.ButtonToggleAdvanced;
+import org.firstinspires.ftc.teamcode.Subsystems.RobotBase;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
@@ -30,10 +30,7 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "TestTeleOp", group = "!")
 public class TestTeleOp extends LinearOpMode {
 
-
-    Servo drone;
-
-    Robot robot;
+    RobotBase robot;
 
     ButtonToggleAdvanced side;
 
@@ -51,22 +48,26 @@ public class TestTeleOp extends LinearOpMode {
     double RX1;
 
     boolean A1;
+    boolean B1;
+    boolean Y1;
+    boolean X1;
 
     boolean START1;
     boolean BACK1;
 
-    // GAMEPAD 2
-    double LY2;
-    double LX2;
-    double RY2;
-    double RX2;
+    boolean LEFTBUMPER1;
+
+    // Gamepad 2
 
     boolean A2;
+    boolean B2;
 
+    boolean DPADUP2;
+    boolean DPADLEFT2;
+    boolean DPADDOWN2;
+    boolean DPADRIGHT2;
 
-
-    double clawPosition;
-
+    boolean topPos;
 
 
     //April tag init
@@ -88,9 +89,8 @@ public class TestTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        drone = hardwareMap.get(Servo.class, "Drone");
 
-        robot = new Robot(hardwareMap);
+        robot = new RobotBase(hardwareMap);
 
 
         initializeAprilTags();
@@ -111,7 +111,9 @@ public class TestTeleOp extends LinearOpMode {
 
         int currentLoop = 0;
 
-        drone.setPosition(0);
+
+        robot.dropper.setPosition(0.3);
+        robot.bucket.setPosition(.7);
 
         while (opModeInInit()) {
 
@@ -125,58 +127,66 @@ public class TestTeleOp extends LinearOpMode {
         waitForStart();
 
         if(opModeIsActive()) {
+            topPos = false;
 
             robot.imuYawOffset = robot.orientation.firstAngle;
 
             while(opModeIsActive()) {
 
+                readInputs();
 
-                if(gamepad1.x) {
-                    drone.setPosition(.5);
+
+                powerIntake(A1, B1);
+                FOD.update(X1);
+                if(Y1) {
+                    robot.imuYawOffset = -robot.orientation.firstAngle;
                 }
 
-                readInputs();
+                isSwitchAlliance();
+
+                alignAprilTag.update(BACK1);
+
+                robot.updateDrive(LY1, LX1, RX1, FOD.getState(), antiTip.getState(), alignAprilTag.getState(), side);
                 robot.update();
 
-                FOD.update(A1);
-                antiTip.update(false);
-                alignAprilTag.update(BACK1);
+
+                // Arm Controls
+
+                if(Math.abs(gamepad2.left_stick_y) > .05) {
+                    robot.changeArmPosition((int) MathUtil.putInRange(-20, (int) (robot.lifter.rightPos + (-gamepad2.left_stick_y * 400)), 900));
+                }
+                if(DPADUP2) {
+                    robot.setArmPosition(600);
+                    topPos = true;
+                }
+                if(DPADDOWN2) {
+                    robot.setArmPosition(20);
+                    robot.bucket.setPosition(.7);
+                    robot.dropper.setPosition(.3);
+                    topPos = false;
+                }
+
+                if(gamepad2.a) {
+                    robot.dropper.setPosition(.8);
+                } else if (gamepad2.b) {
+                    robot.dropper.setPosition(.3);
+                }
+
 
                 // update april tag telemetry data.
                 telemetryAprilTag();
 
-                telemetry.update();
-
-                robot.updateDrive(LY1, LX1, RX1, FOD.getState(), antiTip.getState(), alignAprilTag.getState(), side);
-
-                closeClaw.update(A2);
-                if (closeClaw.getState()){
-                    robot.setClawPosition(Constants.Claw.close);
-                } else {
-                    robot.setClawPosition(Constants.Claw.open);
-                }
-
-                if(gamepad2.dpad_up) {
-                    robot.setSlidePosition(1400);
-                } else if (gamepad2.dpad_down) {
-                    robot.setSlidePosition(-20);
-                } else if (gamepad2.dpad_left) {
-                    robot.setSlidePosition(200);
-                }
-
-                if(Math.abs(gamepad2.left_stick_y) > .05) {
-                    robot.changeSlidePosition((int) MathUtil.putInRange(-20, (int) (robot.lifter.masterPos + (-gamepad2.left_stick_y * 600)), 1600));
-                }
-
-                if(gamepad1.y) {
-                    robot.imuYawOffset = -robot.orientation.firstAngle;
-                }
-
-
-
-                isSwitchAlliance();
                 telemetryAprilTag();
                 updateTelemetry();
+
+
+                if(topPos = true) {
+                    if(robot.lifter.rightPos >= 500) {
+                        robot.bucket.setPosition(1);
+                    } else {
+                        robot.bucket.setPosition(.7);
+                    }
+                }
 
 
 
@@ -191,6 +201,30 @@ public class TestTeleOp extends LinearOpMode {
                 }
             }
         }
+    }
+
+    public void readInputs() {
+        // GAMEPAD 1
+        LY1 = -gamepad1.left_stick_y;
+        LX1 = gamepad1.left_stick_x;
+        RY1 = gamepad1.right_stick_y;
+        RX1 = gamepad1.right_stick_x;
+        A1 = gamepad1.a;
+        B1 = gamepad1.b;
+        Y1 = gamepad1.y;
+        X1 = gamepad1.x;
+        START1 = gamepad1.start;
+        BACK1 = gamepad1.back;
+        LEFTBUMPER1 = gamepad1.left_bumper;
+
+
+        A2 = gamepad2.a;
+        B2 = gamepad2.b;
+
+        DPADUP2 = gamepad2.dpad_up;
+        DPADLEFT2 = gamepad2.dpad_left;
+        DPADDOWN2 = gamepad2.dpad_down;
+        DPADRIGHT2 = gamepad2.dpad_right;
     }
 
     private void telemetryAprilTag() {
@@ -211,50 +245,18 @@ public class TestTeleOp extends LinearOpMode {
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
         }
-//
-//        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-//        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-//        telemetry.addLine("RBE = Range, Bearing & Elevation");
-        //telemetry.addData("Turn Power", robot.drive.turnPower);
-//        telemetry.addData("Claw Position", robot.Claw.getPosition());
-//        telemetry.addData("Test Motor Position", robot.lifter.masterSlide.getCurrentPosition());
-//        telemetry.addData("Test Motor Target Position", robot.lifter.targetPos);
-//
-//        telemetry.addData("Test Motor Velocity", robot.lifter.masterSlide.getVelocity());
-
-
 
         telemetry.update();
-
     }
 
-    public void readInputs() {
-        // GAMEPAD 1
-        LY1 = -gamepad1.left_stick_y;
-        LX1 = gamepad1.left_stick_x;
-        RY1 = gamepad1.right_stick_y;
-        RX1 = gamepad1.right_stick_x;
-        A1 = gamepad1.a;
-        START1 = gamepad1.start;
-        BACK1 = gamepad1.back;
 
-        // GAMEPAD 2
-
-        LY2 = gamepad2.left_stick_y;
-        LX2 = gamepad2.left_stick_x;
-        RY2 = gamepad2.right_stick_y;
-        RX2 = gamepad2.right_stick_x;
-
-
-        A2 = gamepad2.a;
-    }
 
     public void isSwitchAlliance() {
-        if(gamepad1.back && side.getState() == ButtonToggleAdvanced.NEUTRAL_STATE) {
+        if(LEFTBUMPER1 && side.getState() == ButtonToggleAdvanced.NEUTRAL_STATE) {
             side.setState(-1);
         }
 
-        side.update(gamepad1.left_bumper);
+        side.update(LEFTBUMPER1);
 
         if(side.getState() == ButtonToggleAdvanced.NEUTRAL_STATE) {
             allianceT.setValue("Alliance:", "NONE");
@@ -268,39 +270,40 @@ public class TestTeleOp extends LinearOpMode {
     public void updateTelemetry() {
 
         // Driver / Gamepad 1 information
+        telemetry.addData("LY", LY1);
+        telemetry.addData("LX", LX1);
+        telemetry.addData("RY", RY1);
+        telemetry.addData("RX", RX1);
 
-//        telemetry.addData("LY", LY1);
-//        telemetry.addData("LX", LX1);
-//        telemetry.addData("RY", RY1);
-//        telemetry.addData("RX", RX1);
-//
-//        telemetry.addData("FOD", FOD.getState());
-//        telemetry.addData("Anti-Tip", antiTip.getState());
-//        telemetry.addData("Align to April Tag", alignAprilTag.getState());
-//
-//        telemetry.addLine();
-//
-//        // Manipulator / Gamepad 2 information
-//        telemetry.addLine("Manipulator / Gamepad 2");
-//        telemetry.addData("LY", LY2);
-//        telemetry.addData("LX", LX2);
-//        telemetry.addData("RY", RY2);
-//        telemetry.addData("RX", RX2);
-//        telemetry.addLine();
-//
-//
-//        telemetry.addData("Target Power", robot.lifter.getPower());
-//        telemetry.addData("Arm Position", robot.lifter.masterSlide.getCurrentPosition());
-//        telemetry.addData("Target Arm Position", robot.lifter.targetPos);
-//
-//
-//        telemetry.addLine();
-//        telemetry.addData("YAW", Math.toDegrees(robot.getImuYaw()));
-//        telemetry.addData("PITCH", Math.toDegrees(robot.orientation.secondAngle));
-//        telemetry.addData("ROLL", Math.toDegrees(robot.orientation.thirdAngle));
-//        telemetry.addData("Loop Time Average (3 Cycles)", loopTimeAvg);
-//
-//        telemetry.update();
+        telemetry.addData("FOD", FOD.getState());
+        telemetry.addData("Anti-Tip", antiTip.getState());
+        telemetry.addData("Align to April Tag", alignAprilTag.getState());
+
+        telemetry.addLine();
+
+        // Manipulator / Gamepad 2 information
+        telemetry.addData("Target Power", robot.lifter.getPower());
+        telemetry.addData("Arm Position", robot.lifter.rightLift.getCurrentPosition());
+        telemetry.addData("Target Arm Position", robot.lifter.targetPos);
+
+
+        telemetry.addLine();
+        telemetry.addData("YAW", Math.toDegrees(robot.getImuYaw()));
+        telemetry.addData("PITCH", Math.toDegrees(robot.orientation.secondAngle));
+        telemetry.addData("ROLL", Math.toDegrees(robot.orientation.thirdAngle));
+        telemetry.addData("Loop Time Average (3 Cycles) (ms)", loopTimeAvg);
+
+        telemetry.update();
+    }
+
+    private void powerIntake(boolean a, boolean b){
+        if(a) {
+            robot.intakeOn();
+        } else if (b) {
+            robot.intakeOut();
+        } else {
+            robot.intakeOff();
+        }
     }
 
     private void initializeAprilTags() {

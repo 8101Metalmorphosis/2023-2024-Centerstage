@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FTCutil.PID.PIDController;
@@ -11,56 +12,55 @@ import org.firstinspires.ftc.teamcode.FTCutil.PID.ProfiledPIDController;
 
 public class Lifter {
 
-    public DcMotorEx masterSlide, secondarySlide;
-    public int masterPos;
+    public DcMotorEx rightLift, leftLift;
+    public int rightPos;
     public int targetPos;
 
 
     public ProfiledPIDController pidController;
 
     public Lifter(HardwareMap hardwareMap) {
-        masterSlide = hardwareMap.get(DcMotorEx.class, "masterSlide");
-        secondarySlide = hardwareMap.get(DcMotorEx.class, "secondarySlide");
+        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
 
 
-        masterSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        masterPos = masterSlide.getCurrentPosition();
-        targetPos = masterPos;
+
+        rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+//        rightLift.setTargetPosition(rightLift.getCurrentPosition());
+//        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightLift.setPower(.3);
+        rightPos = rightLift.getCurrentPosition();
+        targetPos = rightPos;
 
         pidController =
-                new ProfiledPIDController(1, 0, 0, Constants.Lifter.maxAccel, Constants.Lifter.maxVel, masterPos);
+                new ProfiledPIDController(2, .01, 0, Constants.Lifter.maxAccel, Constants.Lifter.maxVel, rightPos);
     }
 
     public void setPosition(int ticks) {
+//        rightLift.setTargetPosition(ticks);
         targetPos = ticks;
     }
 
-    public void setLength(double length) {
-        setPosition((int) (length * Constants.Lifter.ticksPerInch));
-    }
-
-    public void setHeight(double height) {
-        double slideLength = height / Math.sin(Math.toRadians(Constants.Lifter.angleDEG));
-
-        setPosition((int) (slideLength * Constants.Lifter.ticksPerInch));
-    }
-
-    public void setWidth(double width) {
-        double slideLength = width / Math.cos(Math.toRadians(Constants.Lifter.angleDEG));
-
-        setPosition((int) (slideLength * Constants.Lifter.ticksPerInch));
-    }
-
     public void update() {
-        masterPos = masterSlide.getCurrentPosition();
+//        leftLift.setPower(getPower());
+        rightPos = rightLift.getCurrentPosition();
 
-        double pow = pidController.update(masterPos, targetPos);
 
-        masterSlide.setVelocity(pow);
+
+
+
+        double pow = pidController.update(rightPos, targetPos);
+
+        rightLift.setVelocity(pow);
+        leftLift.setVelocity(pow);
     }
 
     public double getPower() {
-        return pidController.update(masterPos, targetPos);
+//        return rightLift.getPower();
+        return pidController.update(rightPos, targetPos);
     }
 }

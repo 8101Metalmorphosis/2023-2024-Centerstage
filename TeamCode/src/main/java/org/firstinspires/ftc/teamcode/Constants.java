@@ -13,11 +13,11 @@ public class Constants {
 
     public class Lifter {
 
-        public static final int maxLength = 500;
+        public static final int maxLength = 300;
         public static final int lowLength = 0;
 
-        public static final int maxAccel = 16000;
-        public static final int maxVel = 3000;
+        public static final int maxAccel = 1200;
+        public static final int maxVel = 800;
 
         public static final int initialPos = 0;
 

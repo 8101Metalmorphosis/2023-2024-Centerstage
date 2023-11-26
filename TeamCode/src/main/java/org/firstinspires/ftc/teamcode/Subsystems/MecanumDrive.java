@@ -45,6 +45,8 @@ public class MecanumDrive {
         FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        BackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void update() {

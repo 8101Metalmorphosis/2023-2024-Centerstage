@@ -3,22 +3,18 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FTCutil.ButtonToggleAdvanced;
 import org.firstinspires.ftc.teamcode.FTCutil.MathUtil;
 
 import java.util.List;
 
-public class Robot {
+public class RobotBase {
 
     HardwareMap hardwareMap;
 
@@ -31,9 +27,10 @@ public class Robot {
     // Motors
     DcMotorEx FrontLeft, FrontRight, BackLeft, BackRight;
 
+    public DcMotorEx intake;
 
-
-    public Servo Claw;
+    public Servo bucket;
+    public Servo dropper;
 
     public MecanumDrive drive;
     public Lifter lifter;
@@ -52,7 +49,7 @@ public class Robot {
 
 
 
-    public Robot(HardwareMap hardwareMap) {
+    public RobotBase(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
         drive = new MecanumDrive(hardwareMap);
@@ -68,8 +65,9 @@ public class Robot {
 
 
 
-        Claw = hardwareMap.get(Servo.class, "Claw");
-
+        intake = hardwareMap.get(DcMotorEx.class, "Intake");
+        bucket = hardwareMap.get(Servo.class, "Bucket");
+        dropper = hardwareMap.get(Servo.class, "Dropper");
 
 
 
@@ -109,22 +107,27 @@ public class Robot {
         return imuYaw;
     }
 
-    public void setClawPosition(double clawPosition){
-        Claw.setPosition(clawPosition);
-    }
-
-    public void setSlidePosition(int ticks) {
+    public void changeArmPosition(int ticks) {
         lifter.pidController.resetTimer();
         lifter.setPosition(ticks);
     }
 
-    public void changeSlidePosition(int ticks) {
+    public void setArmPosition(int ticks) {
         lifter.setPosition(ticks);
+
     }
 
-//    public void setSlideLength(double inches) {
-//        lifter.setLength(inches);
-//    }
+    public void intakeOn(){
+        intake.setPower(1);
+    }
+
+    public void intakeOff() {
+        intake.setPower(0);
+    }
+
+    public void intakeOut() {
+        intake.setPower(-1);
+    }
 
     public void resetIMU() {
 
