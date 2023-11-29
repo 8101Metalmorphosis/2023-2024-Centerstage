@@ -113,7 +113,7 @@ public class TestTeleOp extends LinearOpMode {
 
 
         robot.dropper.setPosition(0.3);
-        robot.bucket.setPosition(.7);
+        robot.bucket.setPosition(.35);
 
         while (opModeInInit()) {
 
@@ -161,7 +161,7 @@ public class TestTeleOp extends LinearOpMode {
                 }
                 if(DPADDOWN2) {
                     robot.setArmPosition(20);
-                    robot.bucket.setPosition(.7);
+                    robot.bucket.setPosition(.35);
                     robot.dropper.setPosition(.3);
                     topPos = false;
                 }
