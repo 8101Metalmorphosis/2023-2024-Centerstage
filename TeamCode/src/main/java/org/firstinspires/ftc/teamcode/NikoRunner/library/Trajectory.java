@@ -59,14 +59,6 @@ public class Trajectory {
 
                 boolean continuous = splinePath.get(i).type.equals("splineToProfiledHeading") || 
                 splinePath.get(i).type.equals("splineLineToProfiledHeading");
-
-                // try {
-                //     if(continuous != lastContinuity) {
-                //         throw new Exception("Spline is not continuous!");
-                //     }
-                // } catch (Exception e) {
-                //     e.printStackTrace();
-                // }   
                 
                 lastContinuity = continuous;
 
