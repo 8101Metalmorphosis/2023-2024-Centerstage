@@ -32,6 +32,8 @@ public class RobotBase {
     public Servo bucket;
     public Servo dropper;
 
+    public Servo plane;
+
     public MecanumDrive drive;
     public Lifter lifter;
 
@@ -69,7 +71,9 @@ public class RobotBase {
         bucket = hardwareMap.get(Servo.class, "Bucket");
         dropper = hardwareMap.get(Servo.class, "Dropper");
 
+        plane = hardwareMap.get(Servo.class, "Plane");
 
+        dropper.setDirection(Servo.Direction.REVERSE);
 
         allHubs = hardwareMap.getAll(LynxModule.class);
 
@@ -77,7 +81,7 @@ public class RobotBase {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
-
+ // .38
     }
 
     public void update() {
@@ -108,13 +112,12 @@ public class RobotBase {
     }
 
     public void changeArmPosition(int ticks) {
-        lifter.pidController.resetTimer();
+//        lifter.pidController.resetTimer();
         lifter.setPosition(ticks);
     }
 
     public void setArmPosition(int ticks) {
         lifter.setPosition(ticks);
-
     }
 
     public void intakeOn(){

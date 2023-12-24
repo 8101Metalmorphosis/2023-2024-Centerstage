@@ -67,7 +67,7 @@ public class TestTeleOp extends LinearOpMode {
     boolean DPADDOWN2;
     boolean DPADRIGHT2;
 
-    boolean topPos;
+
 
 
     //April tag init
@@ -85,6 +85,12 @@ public class TestTeleOp extends LinearOpMode {
 
 
     double loopTimeAvg;
+
+    public static float BUCKET_DROP = .68f;
+    public static float BUCKET_RESET = .4f;
+
+    public static int DROPPER_OPEN = 1;
+    public static float DROPPER_CLOSE = .75f;
 
     @Override
     public void runOpMode() {
@@ -106,14 +112,25 @@ public class TestTeleOp extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
 
+        ElapsedTime bottomArmTime = new ElapsedTime();
+
         double lastTime = 0;
         double[] loopTime = {};
 
         int currentLoop = 0;
 
+        boolean topPos;
+        boolean bottomPos;
 
-        robot.dropper.setPosition(0.3);
-        robot.bucket.setPosition(.35);
+
+        robot.dropper.setPosition(DROPPER_CLOSE);
+        robot.bucket.setPosition(BUCKET_RESET);
+        robot.plane.setPosition(.5);
+
+
+        robot.lifter.zeroArm();
+        sleep(1000);
+        robot.lifter.resetArm();
 
         while (opModeInInit()) {
 
@@ -128,6 +145,7 @@ public class TestTeleOp extends LinearOpMode {
 
         if(opModeIsActive()) {
             topPos = false;
+            bottomPos = true;
 
             robot.imuYawOffset = robot.orientation.firstAngle;
 
@@ -138,6 +156,8 @@ public class TestTeleOp extends LinearOpMode {
 
                 powerIntake(A1, B1);
                 FOD.update(X1);
+                closeClaw.update(A2);
+
                 if(Y1) {
                     robot.imuYawOffset = -robot.orientation.firstAngle;
                 }
@@ -153,23 +173,31 @@ public class TestTeleOp extends LinearOpMode {
                 // Arm Controls
 
                 if(Math.abs(gamepad2.left_stick_y) > .05) {
-                    robot.changeArmPosition((int) MathUtil.putInRange(-20, (int) (robot.lifter.rightPos + (-gamepad2.left_stick_y * 400)), 900));
+                    robot.changeArmPosition((int) MathUtil.putInRange(-20, (int) (robot.lifter.rightPos + (-gamepad2.left_stick_y * 200)), 800));
                 }
                 if(DPADUP2) {
-                    robot.setArmPosition(600);
+                    robot.setArmPosition(720);
                     topPos = true;
+                    bottomPos = false;
                 }
                 if(DPADDOWN2) {
-                    robot.setArmPosition(20);
-                    robot.bucket.setPosition(.35);
+                    robot.setArmPosition(250);
                     robot.dropper.setPosition(.3);
+                    closeClaw.setState(false);
+
+                    bottomArmTime.reset();
                     topPos = false;
+                    bottomPos = true;
                 }
 
-                if(gamepad2.a) {
-                    robot.dropper.setPosition(.8);
-                } else if (gamepad2.b) {
-                    robot.dropper.setPosition(.3);
+                if(gamepad1.right_bumper) {
+                    robot.plane.setPosition(1);
+                }
+
+                if(closeClaw.getState()) {
+                    robot.dropper.setPosition(DROPPER_OPEN);
+                } else if (!closeClaw.getState()) {
+                    robot.dropper.setPosition(DROPPER_CLOSE);
                 }
 
 
@@ -180,11 +208,23 @@ public class TestTeleOp extends LinearOpMode {
                 updateTelemetry();
 
 
-                if(topPos = true) {
-                    if(robot.lifter.rightPos >= 500) {
-                        robot.bucket.setPosition(1);
+
+
+                if(bottomPos) {
+                    if(robot.lifter.rightLift.getCurrentPosition() <= 100) {
+                        robot.bucket.setPosition(BUCKET_RESET);
+                    } else if(robot.lifter.rightLift.getCurrentPosition() <= 200) {
+                        robot.bucket.setPosition(BUCKET_RESET + .1);
+                    }
+                    if(robot.lifter.rightLift.getCurrentPosition() <= 300 && bottomArmTime.milliseconds() >= 800) {
+                        robot.lifter.rightLift.setTargetPosition(5);
+                        bottomArmTime.reset();
+                    }
+                } else {
+                    if(robot.lifter.rightPos >= 400) {
+                        robot.bucket.setPosition(BUCKET_DROP);
                     } else {
-                        robot.bucket.setPosition(.7);
+                        robot.bucket.setPosition(BUCKET_RESET);
                     }
                 }
 
