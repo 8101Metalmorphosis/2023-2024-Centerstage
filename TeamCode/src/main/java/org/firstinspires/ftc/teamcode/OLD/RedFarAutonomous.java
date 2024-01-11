@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OLD;
 
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-@Autonomous(name = "Blue Far Autonomous", group = "!")
-public class BlueFarAutonomous extends LinearOpMode {
+@Autonomous(name = "Red Far Autonomous", group = "!")
+public class RedFarAutonomous extends LinearOpMode {
 
     OpenCvCamera webcam;
 
@@ -78,7 +78,7 @@ public class BlueFarAutonomous extends LinearOpMode {
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
 
-        BluePipeline detector = new BluePipeline(telemetry);
+        RedPipeline detector = new RedPipeline(telemetry);
         webcam.setPipeline(detector);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -101,22 +101,28 @@ public class BlueFarAutonomous extends LinearOpMode {
         dropper.setPosition(DROPPER_CLOSE);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(15, 60, Math.toRadians(-90));
+        Pose2d startPose = new Pose2d(15, -60, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
+
         Trajectory left = drive.trajectoryBuilder(startPose)
-                .strafeRight(8)
-                .build();
-        Trajectory left2 = drive.trajectoryBuilder(left.end())
-                .splineToLinearHeading(new Pose2d(15, 31, Math.toRadians(0)), Math.toRadians(0))
+                .lineToConstantHeading(new Vector2d(.5, -40))
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(startPose)
-                .splineToConstantHeading(new Vector2d(12, 31), Math.toRadians(-90))
+                .strafeLeft(8)
+                .build();
+
+        Trajectory middle2 = drive.trajectoryBuilder(middle.end())
+                .splineToConstantHeading(new Vector2d(12, -31), Math.toRadians(90))
                 .build();
 
         Trajectory right = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(.5, 40))
+                .strafeLeft(8)
+                .build();
+
+        Trajectory right2 = drive.trajectoryBuilder(right.end())
+                .splineToLinearHeading(new Pose2d(15, -31, Math.toRadians(0)), Math.toRadians(0))
                 .build();
 
 
@@ -150,17 +156,18 @@ public class BlueFarAutonomous extends LinearOpMode {
 
             if(spike == 1) {
                 drive.followTrajectory(right);
+                drive.followTrajectory(right2);
             } else if(spike == 2) {
                 drive.followTrajectory(middle);
+                drive.followTrajectory(middle2);
             } else if(spike == 3) {
                 drive.followTrajectory(left);
-                drive.followTrajectory(left2);
             }
 
             // outtake for a few ms
             intake.setPower(-.5);
             Trajectory traj2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToSplineHeading(new Pose2d(16, 52, Math.toRadians(-90)), Math.toRadians(0))
+                    .splineToSplineHeading(new Pose2d(16, -52, Math.toRadians(90)), Math.toRadians(0))
                     .build();
             drive.followTrajectory(traj2);
             sleep(1000);

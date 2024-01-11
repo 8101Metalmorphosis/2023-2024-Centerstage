@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Constants.*;
+import org.firstinspires.ftc.teamcode.OLD.Constants.*;
 import org.firstinspires.ftc.teamcode.FTCutil.ButtonToggleAdvanced;
 import org.firstinspires.ftc.teamcode.FTCutil.MathUtil;
 import org.firstinspires.ftc.teamcode.FTCutil.PID.PIDController;
@@ -98,23 +98,6 @@ public class MecanumDrive {
             LX = rotatedValues.getX();
             LY = rotatedValues.getY();
         }
-
-//        if (!antiTip) {
-//            yaw = 0;
-//            pitch = 0;
-//            roll = 0;
-//        }
-
-//        if (MathUtil.isInRange(yaw, Chassis.rotationConstraintsRAD[0]) || MathUtil.isInRange(roll, Chassis.rotationConstraintsRAD[1])) {
-//            yaw = yaw * 3;
-//            roll = roll * 3;
-//        } else {
-//            yaw = 0;
-//            roll = 0;
-//        }
-//
-//        yaw = yaw * 3;
-//        roll = roll * 3;
 
         FrontLeft.setPower((LY + LX + RX));
         FrontRight.setPower((LY - LX - RX));

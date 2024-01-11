@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import static java.lang.Thread.sleep;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,60 +7,68 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.FTCutil.PID.PIDController;
-import org.firstinspires.ftc.teamcode.FTCutil.PID.ProfiledPIDController;
 
 public class Lifter {
 
-    public DcMotorEx rightLift, leftLift;
-    public int rightPos;
+//    public DcMotorEx rightLift, leftLift;
+//    public Servo rightArm;
+    public Servo leftArm;
+//    public int leftPos;
     public int targetPos;
 
 
+
     public Lifter(HardwareMap hardwareMap) {
-        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
-        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+//        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+//        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+
+//        rightArm = hardwareMap.get(Servo.class, "liftRightArm");
+        leftArm = hardwareMap.get(Servo.class, "liftLeftArm");
+
+        leftArm.setDirection(Servo.Direction.REVERSE);
 
 
-        resetArm();
-        rightPos = rightLift.getCurrentPosition();
+//        resetArm();
+//        leftPos = rightLift.getCurrentPosition();
     }
 
     public void zeroArm() {
-        rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        rightLift.setPower(-.1);
-        leftLift.setPower(-.1);
+//        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
+//        leftLift.setPower(-.1);
+//        resetArm();
     }
 
     public void resetArm() {
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        rightLift.setTargetPosition(rightLift.getCurrentPosition());
-        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        rightLift.setTargetPosition(leftLift.getCurrentPosition());
-        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightLift.setPower(.3);
-        leftLift.setPower(.3);
-    }
-
-    public void setPosition(int ticks) {
-        rightLift.setTargetPosition(ticks);
-        leftLift.setTargetPosition(ticks);
+//        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        leftLift.setTargetPosition(0);
+//        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//
+//        leftLift.setPower(Constants.LifterConstants.lifterSpeed);
+//        rightLift.setPower(leftLift.getPower());
     }
 
     public void update() {
-        leftLift.setPower(-getPower());
-        rightPos = rightLift.getCurrentPosition();
+//        leftPos = rightLift.getCurrentPosition();
+//
+//        leftLift.setPower(-getPower());
+    }
+
+    public void setArmPosition(float armPosition) {
+//        rightArm.setPosition(armPosition);
+        leftArm.setPosition(armPosition);
+    }
+
+    public void setLifterPosition(int ticks) {
+//        rightLift.setTargetPosition(ticks);
     }
 
     public double getPower() {
-        return rightLift.getPower();
+//        return rightLift.getPower();
+        return 0;
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OLD;
 
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-@Autonomous(name = "Red Far Autonomous", group = "!")
-public class RedFarAutonomous extends LinearOpMode {
+@Autonomous(name = "Blue Autonomous", group = "!")
+public class BlueAutonomous extends LinearOpMode {
 
     OpenCvCamera webcam;
 
@@ -34,7 +34,7 @@ public class RedFarAutonomous extends LinearOpMode {
     public static int LIFTER_TOP = 720;
     public static int LIFTER_RESET = 20;
 
-    public static float BUCKET_DROP = .7f;
+    public static float BUCKET_DROP = .75f;
     public static float BUCKET_RESET = .4f;
 
     public static int DROPPER_OPEN = 1;
@@ -78,7 +78,7 @@ public class RedFarAutonomous extends LinearOpMode {
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
 
-        RedPipeline detector = new RedPipeline(telemetry);
+        BluePipeline detector = new BluePipeline(telemetry);
         webcam.setPipeline(detector);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -101,28 +101,19 @@ public class RedFarAutonomous extends LinearOpMode {
         dropper.setPosition(DROPPER_CLOSE);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(15, -60, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(16, 60, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
-
         Trajectory left = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(.5, -40))
+                .splineToSplineHeading(new Pose2d(9.25, 31, Math.toRadians(-180)), Math.toRadians(190))
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(startPose)
-                .strafeLeft(8)
-                .build();
-
-        Trajectory middle2 = drive.trajectoryBuilder(middle.end())
-                .splineToConstantHeading(new Vector2d(12, -31), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(12, 31), Math.toRadians(-90))
                 .build();
 
         Trajectory right = drive.trajectoryBuilder(startPose)
-                .strafeLeft(8)
-                .build();
-
-        Trajectory right2 = drive.trajectoryBuilder(right.end())
-                .splineToLinearHeading(new Pose2d(15, -31, Math.toRadians(0)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(25, 42, Math.toRadians(-90)), Math.toRadians(0))
                 .build();
 
 
@@ -155,23 +146,48 @@ public class RedFarAutonomous extends LinearOpMode {
             telemetry.update();
 
             if(spike == 1) {
-                drive.followTrajectory(right);
-                drive.followTrajectory(right2);
+                drive.followTrajectory(left);
             } else if(spike == 2) {
                 drive.followTrajectory(middle);
-                drive.followTrajectory(middle2);
             } else if(spike == 3) {
-                drive.followTrajectory(left);
+                drive.followTrajectory(right);
             }
 
             // outtake for a few ms
             intake.setPower(-.5);
             Trajectory traj2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToSplineHeading(new Pose2d(16, -52, Math.toRadians(90)), Math.toRadians(0))
+                    .addSpatialMarker(new Vector2d(15, 34), () -> {
+                        setLifterPosition(400);
+                    })
+                    .addSpatialMarker(new Vector2d(18, 35), () -> {
+                        bucket.setPosition(BUCKET_DROP);
+                    })
+                    .addSpatialMarker(new Vector2d(22, 35), () -> {
+                        setLifterPosition(LIFTER_TOP);
+                    })
+                    .splineToSplineHeading(new Pose2d(48, 35, Math.toRadians(-180)), Math.toRadians(0))
                     .build();
+
+            Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
+                    .addDisplacementMarker(5, () -> {
+                        setLifterPosition(20);
+                    })
+                    .splineToConstantHeading(new Vector2d(60, 60), Math.toRadians(0))
+                    .build();
+            sleep(1000);
             drive.followTrajectory(traj2);
             sleep(1000);
             intake.setPower(0);
+            dropper.setPosition(DROPPER_OPEN);
+            sleep(1000);
+            bucket.setPosition(BUCKET_RESET);
+            sleep(250);
+            dropper.setPosition(DROPPER_CLOSE);
+            setLifterPosition(300);
+            sleep(200);
+            // move arm down
+            drive.followTrajectory(traj3);
+            sleep(5000);
         }
     }
 

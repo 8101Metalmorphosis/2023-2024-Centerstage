@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OLD;
 
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-@Autonomous(name = "Blue Autonomous", group = "!")
-public class BlueAutonomous extends LinearOpMode {
+@Autonomous(name = "Red Autonomous", group = "!")
+public class RedAutonomous extends LinearOpMode {
 
     OpenCvCamera webcam;
 
@@ -72,13 +72,13 @@ public class BlueAutonomous extends LinearOpMode {
 
 
         int cameraMonitorViewId = hardwareMap.appContext
-                .getResources().getIdentifier("cameraMonitorViewId",
-                        "id", hardwareMap.appContext.getPackageName());
+        .getResources().getIdentifier("cameraMonitorViewId",
+                "id", hardwareMap.appContext.getPackageName());
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
 
-        BluePipeline detector = new BluePipeline(telemetry);
+        RedPipeline detector = new RedPipeline(telemetry);
         webcam.setPipeline(detector);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -101,19 +101,19 @@ public class BlueAutonomous extends LinearOpMode {
         dropper.setPosition(DROPPER_CLOSE);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(16, 60, Math.toRadians(-90));
+        Pose2d startPose = new Pose2d(16, -60, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
         Trajectory left = drive.trajectoryBuilder(startPose)
-                .splineToSplineHeading(new Pose2d(9.25, 31, Math.toRadians(-180)), Math.toRadians(190))
+                .splineToSplineHeading(new Pose2d(9.25, -31, Math.toRadians(180)), Math.toRadians(190))
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(startPose)
-                .splineToConstantHeading(new Vector2d(12, 31), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(12, -31), Math.toRadians(90))
                 .build();
 
         Trajectory right = drive.trajectoryBuilder(startPose)
-                .splineToSplineHeading(new Pose2d(25, 42, Math.toRadians(-90)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(25, -42, Math.toRadians(90)), Math.toRadians(0))
                 .build();
 
 
@@ -146,33 +146,33 @@ public class BlueAutonomous extends LinearOpMode {
             telemetry.update();
 
             if(spike == 1) {
-                drive.followTrajectory(left);
+                drive.followTrajectory(right);
             } else if(spike == 2) {
                 drive.followTrajectory(middle);
             } else if(spike == 3) {
-                drive.followTrajectory(right);
+                drive.followTrajectory(left);
             }
 
             // outtake for a few ms
             intake.setPower(-.5);
             Trajectory traj2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .addSpatialMarker(new Vector2d(15, 34), () -> {
+                    .addSpatialMarker(new Vector2d(15, -34), () -> {
                         setLifterPosition(400);
                     })
-                    .addSpatialMarker(new Vector2d(18, 35), () -> {
+                    .addSpatialMarker(new Vector2d(18, -35), () -> {
                         bucket.setPosition(BUCKET_DROP);
                     })
-                    .addSpatialMarker(new Vector2d(22, 35), () -> {
+                    .addSpatialMarker(new Vector2d(22, -35), () -> {
                         setLifterPosition(LIFTER_TOP);
                     })
-                    .splineToSplineHeading(new Pose2d(48, 35, Math.toRadians(-180)), Math.toRadians(0))
+                    .splineToSplineHeading(new Pose2d(48, -35, Math.toRadians(180)), Math.toRadians(0))
                     .build();
 
             Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
                     .addDisplacementMarker(5, () -> {
                         setLifterPosition(20);
                     })
-                    .splineToConstantHeading(new Vector2d(60, 60), Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(60, -60), Math.toRadians(0))
                     .build();
             sleep(1000);
             drive.followTrajectory(traj2);

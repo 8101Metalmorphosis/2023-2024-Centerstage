@@ -24,23 +24,11 @@ public class RobotBase {
     public Orientation orientation;
     public AngularVelocity angularVelocity;
 
-    // Motors
-    DcMotorEx FrontLeft, FrontRight, BackLeft, BackRight;
-
-    public DcMotorEx intake;
-
-    public Servo bucket;
-    public Servo dropper;
-
-    public Servo plane;
 
     public MecanumDrive drive;
     public Lifter lifter;
-
-    int FrontLeftPosition = 0;
-    int FrontRightPosition = 0;
-    int BackLeftPosition = 0;
-    int BackRightPosition = 0;
+//    public Extend extend;
+    public Intake intake;
 
     public double imuYawOffset = 0;
 
@@ -50,12 +38,14 @@ public class RobotBase {
     List<LynxModule> allHubs;
 
 
-
     public RobotBase(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
         drive = new MecanumDrive(hardwareMap);
         lifter = new Lifter(hardwareMap);
+        intake = new Intake(hardwareMap);
+//        extend = new Extend(hardwareMap);
+
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -66,22 +56,11 @@ public class RobotBase {
         angularVelocity = imu.getAngularVelocity();
 
 
-
-        intake = hardwareMap.get(DcMotorEx.class, "Intake");
-        bucket = hardwareMap.get(Servo.class, "Bucket");
-        dropper = hardwareMap.get(Servo.class, "Dropper");
-
-        plane = hardwareMap.get(Servo.class, "Plane");
-
-        dropper.setDirection(Servo.Direction.REVERSE);
-
         allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-
- // .38
     }
 
     public void update() {
@@ -93,6 +72,7 @@ public class RobotBase {
         }
 
         lifter.update();
+//        extend.update();
 
         orientation = imu.getAngularOrientation();
         angularVelocity = imu.getAngularVelocity();
@@ -107,30 +87,43 @@ public class RobotBase {
         );
     }
 
+
+
+    public void updateLifter(int targetPosition) {
+        lifter.setLifterPosition(targetPosition);
+    }
+
+    public void updateLifterArm(float targetPosition) {
+        lifter.setArmPosition(targetPosition);
+    }
+
+    public void updateLifterSystem(int targetLiftPosition, float targetArmPosition) {
+        lifter.setLifterPosition(targetLiftPosition);
+        lifter.setArmPosition(targetArmPosition);
+    }
+
+//    public void updateExtend(int targetPosition) {
+//        extend.setExtendPosition(targetPosition);
+//    }
+//
+//    public void updateExtendArm(float targetPosition) {
+//        extend.setArmPosition(targetPosition);
+//    }
+//
+//    public void updateExtendSystem(int targetLiftPosition, float targetArmPosition) {
+//        extend.setExtendPosition(targetLiftPosition);
+//        extend.setArmPosition(targetArmPosition);
+//    }
+
+    public void setIntake(float speed) {
+        intake.setSpeed(speed);
+    }
+
     public double getImuYaw() {
         return imuYaw;
     }
 
-    public void changeArmPosition(int ticks) {
-//        lifter.pidController.resetTimer();
-        lifter.setPosition(ticks);
-    }
 
-    public void setArmPosition(int ticks) {
-        lifter.setPosition(ticks);
-    }
-
-    public void intakeOn(){
-        intake.setPower(1);
-    }
-
-    public void intakeOff() {
-        intake.setPower(0);
-    }
-
-    public void intakeOut() {
-        intake.setPower(-1);
-    }
 
     public void resetIMU() {
 
