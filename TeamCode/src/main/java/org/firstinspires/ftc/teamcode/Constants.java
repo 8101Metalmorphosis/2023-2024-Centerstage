@@ -28,7 +28,7 @@ public class Constants {
     public static class ClawConstants {
         public static float liftArmReset = .1f;
         public static float liftArmIdle = .3f;
-        public static float liftArmTop = .5f;
+        public static float liftArmTop = .6f;
 
         public static float wristTransfer = 0.165f;
         public static float wristDrop = .75f;
