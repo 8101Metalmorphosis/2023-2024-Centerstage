@@ -21,7 +21,19 @@ public class Constants {
         public static float doorClose = .175f;
         public static float doorOpen = .55f;
 
-        public static float intakePivotReset = .1f;
-        public static float intakePivotDown = .7f;
+        public static float intakePivotReset = 1f;
+        public static float intakePivotDown = .1f;
+    }
+
+    public static class ClawConstants {
+        public static float liftArmReset = .1f;
+        public static float liftArmIdle = .3f;
+        public static float liftArmTop = .5f;
+
+        public static float wristTransfer = 0.165f;
+        public static float wristDrop = .75f;
+
+        public static float clawOpen = .25f;
+        public static float clawClose = .6f;
     }
 }

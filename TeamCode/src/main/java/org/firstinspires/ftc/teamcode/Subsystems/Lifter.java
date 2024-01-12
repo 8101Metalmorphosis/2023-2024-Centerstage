@@ -13,6 +13,8 @@ public class Lifter {
 //    public DcMotorEx rightLift, leftLift;
 //    public Servo rightArm;
     public Servo leftArm;
+    public Servo wrist;
+    public Servo claw;
 //    public int leftPos;
     public int targetPos;
 
@@ -24,12 +26,22 @@ public class Lifter {
 
 //        rightArm = hardwareMap.get(Servo.class, "liftRightArm");
         leftArm = hardwareMap.get(Servo.class, "liftLeftArm");
+        wrist = hardwareMap.get(Servo.class, "Wrist");
+        claw = hardwareMap.get(Servo.class, "Claw");
 
         leftArm.setDirection(Servo.Direction.REVERSE);
 
 
 //        resetArm();
 //        leftPos = rightLift.getCurrentPosition();
+    }
+
+    public void clawOpen() {
+        claw.setPosition(Constants.ClawConstants.clawOpen);
+    }
+
+    public void clawClose() {
+        claw.setPosition(Constants.ClawConstants.clawClose);
     }
 
     public void zeroArm() {
@@ -61,6 +73,10 @@ public class Lifter {
     public void setArmPosition(float armPosition) {
 //        rightArm.setPosition(armPosition);
         leftArm.setPosition(armPosition);
+    }
+
+    public void setWristPosition(float wristPosition) {
+        wrist.setPosition(wristPosition);
     }
 
     public void setLifterPosition(int ticks) {

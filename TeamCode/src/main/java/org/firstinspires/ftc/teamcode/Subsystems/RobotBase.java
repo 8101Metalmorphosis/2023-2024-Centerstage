@@ -89,18 +89,21 @@ public class RobotBase {
 
 
 
-    public void updateLifter(int targetPosition) {
-        lifter.setLifterPosition(targetPosition);
-    }
-
+//    public void updateLifter(int targetPosition) {
+//        lifter.setLifterPosition(targetPosition);
+//    }
+//
     public void updateLifterArm(float targetPosition) {
         lifter.setArmPosition(targetPosition);
     }
-
-    public void updateLifterSystem(int targetLiftPosition, float targetArmPosition) {
-        lifter.setLifterPosition(targetLiftPosition);
-        lifter.setArmPosition(targetArmPosition);
+    public void updateLifterWrist(float targetPosition) {
+        lifter.setWristPosition(targetPosition);
     }
+//
+//    public void updateLifterSystem(int targetLiftPosition, float targetArmPosition) {
+//        lifter.setLifterPosition(targetLiftPosition);
+//        lifter.setArmPosition(targetArmPosition);
+//    }
 
 //    public void updateExtend(int targetPosition) {
 //        extend.setExtendPosition(targetPosition);
