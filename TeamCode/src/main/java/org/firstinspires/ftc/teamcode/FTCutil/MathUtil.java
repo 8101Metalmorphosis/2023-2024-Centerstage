@@ -54,7 +54,7 @@ public class MathUtil {
     }
 
 
-//    public static int calculateTimeMS(float lastPosition, float targetPosition, int timePerHalf) {
-//        return (int) Math.abs(((targetPosition - lastPosition) / .5) * timePerHalf);
-//    }
+    public static int calculateTimeMS(double lastPosition, double targetPosition, int timePerHalf) {
+        return (int) Math.abs(((targetPosition - lastPosition) / .5) * timePerHalf);
+    }
 }

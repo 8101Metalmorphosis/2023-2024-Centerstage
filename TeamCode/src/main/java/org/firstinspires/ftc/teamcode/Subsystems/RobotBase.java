@@ -65,6 +65,7 @@ public class RobotBase {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
+        // Needs bulk reading
 
         lifter.update();
         extend.update();

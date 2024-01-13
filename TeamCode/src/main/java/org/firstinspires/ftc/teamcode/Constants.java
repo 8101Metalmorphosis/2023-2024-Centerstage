@@ -30,13 +30,13 @@ public class Constants {
 
         public static float intakeExtendArm = .1f;
         public static float resetExtendArm = 1f;
-
-        public static float intakeSpeed = 1f;
     }
 
     public static class IntakeConstants {
         public static float doorClose = .175f;
         public static float doorOpen = .55f;
+
+        public static float intakeSpeed = 1f;
     }
 
     public static class ClawConstants {
@@ -45,23 +45,19 @@ public class Constants {
 
         public static float clawOpen = .25f;
         public static float clawClose = .6f;
-
-
     }
 
     public static class TimerConstants {
         // ALL TIMERS ARE PER .5 ROTATION
 
-        // right now, all are guessed
-
         // Lifter
-        public static int liftArmTimeMS = 400;
-        public static int wristTimeMS = 200;
-        public static int clawTimeMS = 100;
+        public static int liftArmTimeMS = 1000;
+        public static int wristTimeMS = 1000;
+        public static int clawTimeMS = 1000;
 
         // Extend
-        public static int extendArmTimeMS = 400;
-        public static int doorTimeMS = 250;
+        public static int extendArmTimeMS = 1000;
+        public static int doorTimeMS = 1000;
 
     }
 }
