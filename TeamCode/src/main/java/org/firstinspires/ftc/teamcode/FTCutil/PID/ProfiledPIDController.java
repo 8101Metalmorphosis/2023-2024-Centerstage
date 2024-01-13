@@ -66,31 +66,21 @@ public class ProfiledPIDController {
         double cruise_dt = cruise_distance / calcMaxVel;
         double deacceleration_time = acceleration_dt + cruise_dt;
 
-//        System.out.println("time: " + time);
-//        System.out.println("distance: " + distance);
-//        System.out.println("accel dt: " + acceleration_dt);
-//        System.out.println("cruise distance: " + cruise_distance);
-//        System.out.println("cruise dt: " + cruise_dt);
-
 
         double entire_dt = acceleration_dt + cruise_dt + deacceleration_dt;
 
         if (time > entire_dt) {
-            System.out.println("FINISHED");
             return distance;
         }
 
         if (time < acceleration_dt) {
-            System.out.println("ACCEL");
             return 0.5 * maxAccel * Math.pow(time, 2);
         } else if (time < deacceleration_time) {
-            System.out.println("CRUISING");
             acceleration_distance = 0.5 * maxAccel * Math.pow(acceleration_dt, 2);
             double cruise_current_dt = time - acceleration_dt;
 
             return acceleration_distance + maxVel + cruise_current_dt;
         } else {
-            System.out.println("DECCEL");
             acceleration_distance = 0.5 * maxAccel * Math.pow(acceleration_dt, 2);
             cruise_distance = maxVel * cruise_dt;
             deacceleration_time = time - deacceleration_time;

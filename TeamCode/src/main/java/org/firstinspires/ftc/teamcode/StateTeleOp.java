@@ -166,7 +166,6 @@ public class StateTeleOp extends LinearOpMode {
                     } else {
                         robot.lifter.leftArm.setPosition(Constants.ClawConstants.liftArmIdle);
                     }
-
                 } else if (state == States.TRANSFER) {
                     if(firstState == true) {
                         firstState = false;

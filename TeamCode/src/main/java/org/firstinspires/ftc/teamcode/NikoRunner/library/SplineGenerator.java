@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.NikoRunner.library;
 import java.util.ArrayList;
 
 public class SplineGenerator {
-    double waypoints = 500;
+    double waypoints = 500; // SHOULD BE 6-12 WHEN IN USE
     double lerpMultiplier = 1 / waypoints;
 
     final double defaultTanDistance = 5;
