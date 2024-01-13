@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -27,8 +24,7 @@ public class RobotBase {
 
     public MecanumDrive drive;
     public Lifter lifter;
-//    public Extend extend;
-    public Intake intake;
+    public Extend extend;
 
     public double imuYawOffset = 0;
 
@@ -43,8 +39,7 @@ public class RobotBase {
 
         drive = new MecanumDrive(hardwareMap);
         lifter = new Lifter(hardwareMap);
-        intake = new Intake(hardwareMap);
-//        extend = new Extend(hardwareMap);
+        extend = new Extend(hardwareMap);
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -72,7 +67,7 @@ public class RobotBase {
         }
 
         lifter.update();
-//        extend.update();
+        extend.update();
 
         orientation = imu.getAngularOrientation();
         angularVelocity = imu.getAngularVelocity();
@@ -88,22 +83,33 @@ public class RobotBase {
     }
 
 
+    // Lifter
+    public void setLifter(int targetPosition) {
+        lifter.setLifterPosition(targetPosition);
+    }
 
-//    public void updateLifter(int targetPosition) {
-//        lifter.setLifterPosition(targetPosition);
-//    }
-//
-    public void updateLifterArm(float targetPosition) {
+    public void setLifterArm(float targetPosition) {
         lifter.setArmPosition(targetPosition);
     }
-    public void updateLifterWrist(float targetPosition) {
+
+    public void setLifterWrist(float targetPosition) {
         lifter.setWristPosition(targetPosition);
     }
-//
-//    public void updateLifterSystem(int targetLiftPosition, float targetArmPosition) {
-//        lifter.setLifterPosition(targetLiftPosition);
-//        lifter.setArmPosition(targetArmPosition);
-//    }
+
+    public void setLifterSystem(int targetLiftPosition, float targetArmPosition, float targetWristPosition) {
+        lifter.setLifterPosition(targetLiftPosition);
+        lifter.setArmPosition(targetArmPosition);
+        lifter.setWristPosition(targetWristPosition);
+    }
+
+    // Extend
+    public void setExtend(int targetPosition) {
+        extend.setExtendPosition(targetPosition);
+    }
+
+    public void setExtendArm(float targetPosition) {
+        extend.setArmPosition(targetPosition);
+    }
 
 //    public void updateExtend(int targetPosition) {
 //        extend.setExtendPosition(targetPosition);
@@ -119,7 +125,7 @@ public class RobotBase {
 //    }
 
     public void setIntake(float speed) {
-        intake.setSpeed(speed);
+        extend.setIntakeSpeed(speed);
     }
 
     public double getImuYaw() {

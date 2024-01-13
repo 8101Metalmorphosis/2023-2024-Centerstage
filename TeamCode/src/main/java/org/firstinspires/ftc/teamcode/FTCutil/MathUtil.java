@@ -52,4 +52,9 @@ public class MathUtil {
 
         return false;
     }
+
+
+//    public static int calculateTimeMS(float lastPosition, float targetPosition, int timePerHalf) {
+//        return (int) Math.abs(((targetPosition - lastPosition) / .5) * timePerHalf);
+//    }
 }

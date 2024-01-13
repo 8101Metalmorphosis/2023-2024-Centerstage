@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -10,34 +8,57 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Lifter {
 
-//    public DcMotorEx rightLift, leftLift;
-//    public Servo rightArm;
+    public DcMotorEx rightLift;
+
     public Servo leftArm;
     public Servo rightArm;
 
     public Servo wrist;
     public Servo claw;
-//    public int leftPos;
-    public int targetPos;
 
+    public int currentLiftPosition;
+    public int targetLiftPosition;
+
+    public double currentArmPosition;
+    public double currentWristPosition;
+    public double currentClawPosition;
 
 
     public Lifter(HardwareMap hardwareMap) {
-//        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
-//        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
 
-//        rightArm = hardwareMap.get(Servo.class, "liftRightArm");
         leftArm = hardwareMap.get(Servo.class, "liftLeftArm");
         rightArm = hardwareMap.get(Servo.class, "liftRightArm");
         wrist = hardwareMap.get(Servo.class, "Wrist");
         claw = hardwareMap.get(Servo.class, "Claw");
 
         leftArm.setDirection(Servo.Direction.REVERSE);
-
-
-//        resetArm();
-//        leftPos = rightLift.getCurrentPosition();
     }
+
+    public void update() {
+        currentLiftPosition = rightLift.getCurrentPosition();
+
+        currentArmPosition = leftArm.getPosition();
+        currentWristPosition = wrist.getPosition();
+        currentClawPosition = claw.getPosition();
+    }
+
+    public void setLifterPosition(int ticks) {
+        targetLiftPosition = ticks;
+
+        rightLift.setTargetPosition(ticks);
+    }
+
+    public void setArmPosition(float armPosition) {
+        leftArm.setPosition(armPosition);
+        rightArm.setPosition(armPosition);
+    }
+
+    public void setWristPosition(float wristPosition) {
+        wrist.setPosition(wristPosition);
+    }
+
+
 
     public void clawOpen() {
         claw.setPosition(Constants.ClawConstants.clawOpen);
@@ -47,48 +68,17 @@ public class Lifter {
         claw.setPosition(Constants.ClawConstants.clawClose);
     }
 
+
     public void zeroArm() {
-//        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//
-//        leftLift.setPower(-.1);
-//        resetArm();
+        // Move arm down, in torque mode
     }
 
     public void resetArm() {
-//        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
-//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        leftLift.setTargetPosition(0);
-//        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//
-//        leftLift.setPower(Constants.LifterConstants.lifterSpeed);
-//        rightLift.setPower(leftLift.getPower());
+        // Reset encoder, turn on run to position
     }
 
-    public void update() {
-//        leftPos = rightLift.getCurrentPosition();
-//
-//        leftLift.setPower(-getPower());
-    }
-
-    public void setArmPosition(float armPosition) {
-//        rightArm.setPosition(armPosition);
-        leftArm.setPosition(armPosition);
-        rightArm.setPosition(armPosition);
-    }
-
-    public void setWristPosition(float wristPosition) {
-        wrist.setPosition(wristPosition);
-    }
-
-    public void setLifterPosition(int ticks) {
-//        rightLift.setTargetPosition(ticks);
-    }
 
     public double getPower() {
-//        return rightLift.getPower();
-        return 0;
+        return rightLift.getPower();
     }
 }

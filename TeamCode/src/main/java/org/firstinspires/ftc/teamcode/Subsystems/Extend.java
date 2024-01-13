@@ -1,70 +1,70 @@
-//package org.firstinspires.ftc.teamcode.Subsystems;
-//
-//import com.qualcomm.robotcore.hardware.CRServo;
-//import com.qualcomm.robotcore.hardware.DcMotor;
-//import com.qualcomm.robotcore.hardware.DcMotorEx;
-//import com.qualcomm.robotcore.hardware.DcMotorSimple;
-//import com.qualcomm.robotcore.hardware.HardwareMap;
-//import com.qualcomm.robotcore.hardware.Servo;
-//
-//import org.firstinspires.ftc.teamcode.Constants;
-//
-//public class Extend {
-////    public DcMotorEx extendLift;
-//    public Servo extendArm;
-//    public CRServo extendIntake;
-//
-//
-//    public int extendPos;
-//    public int targetPos;
-//
-//    public Extend(HardwareMap hardwareMap) {
-////        extendLift = hardwareMap.get(DcMotorEx.class, "extendLift");
-//
-//        extendArm = hardwareMap.get(Servo.class, "extendArm");
-//        extendIntake = hardwareMap.get(CRServo.class, "extendIntake");
-//
-//        resetExtend();
-//    }
-//
-//    public void zeroExtend() {
-////        extendLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-////
-////        extendLift.setPower(-.1);
-////        resetExtend();
-//    }
-//
-//    public void resetExtend() {
-////        extendLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-////
-////        extendLift.setDirection(DcMotorSimple.Direction.REVERSE);
-////
-////        extendLift.setTargetPosition(extendLift.getCurrentPosition());
-////        extendLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-////
-////
-////        extendLift.setPower(Constants.ExtendConstants.extendSpeed);
-//    }
-//
-//    public void setExtendPosition(int ticks) {
-////        targetPos = ticks;
-//
-////        extendLift.setTargetPosition(ticks);
-//    }
-//
-//    public void setArmPosition(float position) {
-//        extendArm.setPosition(position);
-//    }
-//
-//    public void setIntakeSpeed(float speed) {
-//        extendIntake.setPower(speed);
-//    }
-//
-//    public void update() {
-//        extendPos = extendLift.getCurrentPosition();
-//    }
-//
-//    public double getPower() {
-//        return extendLift.getPower();
-//    }
-//}
+package org.firstinspires.ftc.teamcode.Subsystems;
+
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.Constants;
+
+
+public class Extend {
+    public DcMotorEx extend;
+    public DcMotorEx intake;
+
+    public Servo extendArm;
+    public Servo intakeDoor;
+
+
+    public int currentExtendPosition;
+    public int targetExtendPosition;
+
+    public double currentArmPosition;
+    public double currentIntakeDoorPosition;
+
+    public Extend(HardwareMap hardwareMap) {
+        extend = hardwareMap.get(DcMotorEx.class, "extendLift");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+
+        extendArm = hardwareMap.get(Servo.class, "extendArm");
+        intakeDoor = hardwareMap.get(Servo.class, "intakeDoor");
+    }
+
+    public void update() {
+        currentExtendPosition = extend.getCurrentPosition();
+
+        currentArmPosition = extendArm.getPosition();
+        currentIntakeDoorPosition = intakeDoor.getPosition();
+    }
+
+    public void setExtendPosition(int ticks) {
+        targetExtendPosition = ticks;
+        extend.setTargetPosition(ticks);
+    }
+
+    public void setArmPosition(float armPosition) {
+        extendArm.setPosition(armPosition);
+    }
+
+    public void pivotArmDown() {
+        extendArm.setPosition(Constants.ExtendConstants.intakeExtendArm);
+    }
+
+    public void pivotArmUp() {
+        extendArm.setPosition(Constants.ExtendConstants.resetExtendArm);
+    }
+
+
+    // Intake
+    public void setIntakeSpeed(float speed) {
+        intake.setPower(speed);
+    }
+
+    public void openIntakeDoor() {
+        intakeDoor.setPosition(Constants.IntakeConstants.doorOpen);
+    }
+
+    public void closeIntakeDoor() {
+        intakeDoor.setPosition(Constants.IntakeConstants.doorClose);
+    }
+
+}
