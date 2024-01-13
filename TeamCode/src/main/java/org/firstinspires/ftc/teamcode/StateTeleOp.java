@@ -149,8 +149,7 @@ public class StateTeleOp extends LinearOpMode {
 
                             firstState = false;
                         }
-
-
+                        
 
                         // Move arm to intake position
                         if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmIntake &&
