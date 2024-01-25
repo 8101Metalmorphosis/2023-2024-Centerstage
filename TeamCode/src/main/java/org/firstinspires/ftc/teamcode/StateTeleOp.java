@@ -49,7 +49,7 @@ public class StateTeleOp extends LinearOpMode {
     double RY2;
 
 
-
+    boolean L2BUMPER;
     boolean R2BUMPER;
 
 
@@ -138,7 +138,7 @@ public class StateTeleOp extends LinearOpMode {
                             stateTime = new ElapsedTime();
 
                             robot.setLifter(Constants.LifterConstants.lifterZeroOffset);
-                            robot.setLifterWrist(Constants.ClawConstants.wristTransfer);
+                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
                             robot.lifter.clawOpen();
 
                             robot.setExtend(robot.extend.currentExtendPosition);
@@ -208,7 +208,8 @@ public class StateTeleOp extends LinearOpMode {
                             stateTime = new ElapsedTime();
 
                             robot.setLifter(Constants.LifterConstants.lifterZeroOffset);
-                            robot.setLifterWrist(Constants.ClawConstants.wristTransfer);
+                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+                            robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
                             robot.lifter.clawOpen();
 
                             robot.setExtend(robot.extend.currentExtendPosition);
@@ -285,7 +286,7 @@ public class StateTeleOp extends LinearOpMode {
                             stateTime = new ElapsedTime();
 
                             robot.setLifter(Constants.LifterConstants.lifterZeroOffset);
-                            robot.setLifterWrist(Constants.ClawConstants.wristTransfer);
+                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
                             robot.lifter.clawOpen();
 
                             robot.setExtend(robot.extend.currentExtendPosition);
@@ -314,7 +315,7 @@ public class StateTeleOp extends LinearOpMode {
                                         }
 
                                     } else {
-                                        robot.lifter.setWristPosition(Constants.ClawConstants.wristDrop);
+                                        robot.lifter.setWristPitchPosition(Constants.ClawConstants.wristPitchDrop);
                                     }
                                 } else {
                                     robot.lifter.setArmPosition(Constants.LifterConstants.liftArmTop);
@@ -327,6 +328,15 @@ public class StateTeleOp extends LinearOpMode {
                                 // Lifter Controls
                             if (!MathUtil.isInRange(LY2, Constants.OtherConstants.joystickThreshold)) {
                                 robot.setLifter((int) (LY2 * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition));
+                            }
+
+                                // Wrist Controls
+                            if(L2BUMPER) {
+                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeft);
+                            } else if (R2BUMPER) {
+                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRight);
+                            } else {
+                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
                             }
 
                                 // Claw Controls
@@ -352,6 +362,7 @@ public class StateTeleOp extends LinearOpMode {
         }
     }
 
+    
     public void updateInputs() {
         // Gamepad 1
         LY1 = -gamepad1.left_stick_y;
@@ -375,7 +386,9 @@ public class StateTeleOp extends LinearOpMode {
         LEFTTRIGGER1 = gamepad1.left_trigger;
         RIGHTTRIGGER1 = gamepad1.right_trigger;
 
+        L2BUMPER = gamepad2.left_bumper;
         R2BUMPER = gamepad2.right_bumper;
+
         A2 = gamepad2.a;
         B2 = gamepad2.b;
         Y2 = gamepad2.y;

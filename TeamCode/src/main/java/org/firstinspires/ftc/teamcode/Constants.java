@@ -40,8 +40,12 @@ public class Constants {
     }
 
     public static class ClawConstants {
-        public static float wristTransfer = 0.165f;
-        public static float wristDrop = .75f;
+        public static float wristPitchTransfer = 0.165f;
+        public static float wristPitchDrop = .75f;
+
+        public static float wristRollVertical = .5f;
+        public static float wristRollLeft = .25f;
+        public static float wristRollRight = .75f;
 
         public static float clawOpen = .25f;
         public static float clawClose = .6f;

@@ -13,14 +13,16 @@ public class Lifter {
     public Servo leftArm;
     public Servo rightArm;
 
-    public Servo wrist;
+    public Servo WristPitch;
+    public Servo WristRoll;
     public Servo claw;
 
     public int currentLiftPosition;
     public int targetLiftPosition;
 
     public double currentArmPosition;
-    public double currentWristPosition;
+    public double currentWristPitchPosition;
+    public double currentWristRollPosition;
     public double currentClawPosition;
 
 
@@ -29,7 +31,9 @@ public class Lifter {
 
         leftArm = hardwareMap.get(Servo.class, "liftLeftArm");
         rightArm = hardwareMap.get(Servo.class, "liftRightArm");
-        wrist = hardwareMap.get(Servo.class, "Wrist");
+
+        WristPitch = hardwareMap.get(Servo.class, "Pitch Wrist");
+        WristRoll = hardwareMap.get(Servo.class, "Roll Wrist");
         claw = hardwareMap.get(Servo.class, "Claw");
 
         leftArm.setDirection(Servo.Direction.REVERSE);
@@ -39,7 +43,10 @@ public class Lifter {
         currentLiftPosition = rightLift.getCurrentPosition();
 
         currentArmPosition = leftArm.getPosition();
-        currentWristPosition = wrist.getPosition();
+
+        currentWristPitchPosition = WristPitch.getPosition();
+        currentWristRollPosition = WristRoll.getPosition();
+
         currentClawPosition = claw.getPosition();
     }
 
@@ -54,10 +61,13 @@ public class Lifter {
         rightArm.setPosition(armPosition);
     }
 
-    public void setWristPosition(float wristPosition) {
-        wrist.setPosition(wristPosition);
+    public void setWristPitchPosition(float wristPosition) {
+        WristPitch.setPosition(wristPosition);
     }
 
+    public void setWristRollPosition(float wristPosition) {
+        WristRoll.setPosition(wristPosition);
+    }
 
 
     public void clawOpen() {
@@ -66,19 +76,5 @@ public class Lifter {
 
     public void clawClose() {
         claw.setPosition(Constants.ClawConstants.clawClose);
-    }
-
-
-    public void zeroArm() {
-        // Move arm down, in torque mode
-    }
-
-    public void resetArm() {
-        // Reset encoder, turn on run to position
-    }
-
-
-    public double getPower() {
-        return rightLift.getPower();
     }
 }
