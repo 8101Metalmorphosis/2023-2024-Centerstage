@@ -109,7 +109,7 @@ public class RobotBase {
     public void setLifterSystem(int targetLiftPosition, float targetArmPosition, float targetWristPosition) {
         lifter.setLifterPosition(targetLiftPosition);
         lifter.setArmPosition(targetArmPosition);
-        lifter.setWristPosition(targetWristPosition);
+        lifter.setWristPitchPosition(targetWristPosition);
     }
 
     // Extend

@@ -22,11 +22,11 @@ public class Extend {
     public double currentIntakeDoorPosition;
 
     public Extend(HardwareMap hardwareMap) {
-        extend = hardwareMap.get(DcMotorEx.class, "extendLift");
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        extend = hardwareMap.get(DcMotorEx.class, "leftExtend");
+        intake = hardwareMap.get(DcMotorEx.class, "Intake");
 
-        extendArm = hardwareMap.get(Servo.class, "extendArm");
-        intakeDoor = hardwareMap.get(Servo.class, "intakeDoor");
+        extendArm = hardwareMap.get(Servo.class, "IntakePivot");
+        intakeDoor = hardwareMap.get(Servo.class, "IntakeDoor");
     }
 
     public void update() {

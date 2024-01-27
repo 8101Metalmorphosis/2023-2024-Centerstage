@@ -9,16 +9,20 @@ public class Constants {
 
     public static class LifterConstants {
         public static int maxTicksPerLoop = 400;
-        public static float lifterSpeed = .3f;
+        public static float lifterSpeed = .7f;
+        public static float lifterZeroSpeed = -.3f;
 
-        public static int lifterZeroOffset = 10;
+        public static int lifterMaxHeight = 2000;
+        public static int lifterMinHeight = 100;
+
+
         public static int lifterAllowedThreshold = 50;
 
 
         public static float liftArmReset = .1f;
         public static float liftArmIdle = .3f;
         public static float liftArmIntake = .45f;
-        public static float liftArmTop = .6f;
+        public static float liftArmTop = .65f;
     }
 
     public static class ExtendConstants {
@@ -29,12 +33,12 @@ public class Constants {
         public static int extendAllowedThreshold = 50;
 
         public static float intakeExtendArm = .1f;
-        public static float resetExtendArm = 1f;
+        public static float resetExtendArm = .82f;
     }
 
     public static class IntakeConstants {
-        public static float doorClose = .175f;
-        public static float doorOpen = .55f;
+        public static float doorClose = .1f;
+        public static float doorOpen = .7f;
 
         public static float intakeSpeed = 1f;
     }
@@ -44,11 +48,11 @@ public class Constants {
         public static float wristPitchDrop = .75f;
 
         public static float wristRollVertical = .5f;
-        public static float wristRollLeft = .25f;
-        public static float wristRollRight = .75f;
+        public static float wristRollLeft = .85f;
+        public static float wristRollRight = .15f;
 
-        public static float clawOpen = .25f;
-        public static float clawClose = .6f;
+        public static float clawOpen = .21f;
+        public static float clawClose = .7f;
     }
 
     public static class TimerConstants {
