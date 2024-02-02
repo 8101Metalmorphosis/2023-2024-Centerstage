@@ -43,7 +43,6 @@ public class Lifter {
         leftLift.setDirection(DcMotorEx.Direction.REVERSE);
         rightLift.setDirection(DcMotorEx.Direction.REVERSE);
 
-
         leftArm.setDirection(Servo.Direction.REVERSE);
     }
 
@@ -62,6 +61,9 @@ public class Lifter {
         leftLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
+        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
+
         leftLift.setPower(Constants.LifterConstants.lifterSpeed);
         rightLift.setPower(Constants.LifterConstants.lifterSpeed);
 
@@ -71,8 +73,6 @@ public class Lifter {
         leftLift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
-        rightLift.setDirection(DcMotorEx.Direction.REVERSE);
     }
 
     public void zeroArm() {
