@@ -54,26 +54,26 @@ public class StateTeleOp extends LinearOpMode {
     boolean START1;
 
     // Gamepad 2
-    double LY2;
-
-    double RY2;
-
-
-    boolean LEFTBUMPER2;
-    boolean RIGHTBUMPER2;
-
-    double LEFTTRIGGER2;
-    double RIGHTTRIGGER2;
-
-
-    boolean A2;
-    boolean B2;
-    boolean Y2;
-    boolean X2;
-
-    boolean DPAD_UP2;
-    boolean DPAD_LEFT2;
-    boolean DPAD_DOWN2;
+//    double LY2;
+//
+//    double RY2;
+//
+//
+//    boolean LEFTBUMPER2;
+//    boolean RIGHTBUMPER2;
+//
+//    double LEFTTRIGGER2;
+//    double RIGHTTRIGGER2;
+//
+//
+//    boolean A2;
+//    boolean B2;
+//    boolean Y2;
+//    boolean X2;
+//
+//    boolean DPAD_UP2;
+//    boolean DPAD_LEFT2;
+//    boolean DPAD_DOWN2;
 
 
     public enum States {
@@ -141,22 +141,22 @@ public class StateTeleOp extends LinearOpMode {
                 // Controls
                 FOD.update(START1);
 
-                arm.update(LEFTBUMPER2);
+                arm.update(Y1);
 
 
                 // Update Robot
                 robot.updateDrive(LY1, LX1, RX1, FOD.getState(), false, alignAprilTag.getState(), antiTip);
 
 
-                if (DPAD_UP2 || DPAD_LEFT2 || DPAD_DOWN2) {
+                if (DPAD_UP1 || DPAD_LEFT1 || DPAD_DOWN1) {
                     firstState = true;
                     stateTimes = new ArrayList<>();
 
-                    if(DPAD_UP2) {
+                    if(DPAD_UP1) {
                         state = States.PLACE;
-                    } else if (DPAD_LEFT2) {
+                    } else if (DPAD_LEFT1) {
                         state = States.TRANSFER;
-                    } else if (DPAD_DOWN2) {
+                    } else if (DPAD_DOWN1) {
                         state = States.INTAKE;
                     }
                 }
@@ -217,10 +217,10 @@ public class StateTeleOp extends LinearOpMode {
 
                                     // MANUAL CONTROLS
                                         // Extend Controls
-                                    if (!MathUtil.isInRange(LEFTTRIGGER2, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER2, Constants.OtherConstants.joystickThreshold)) {
+                                    if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
                                         robot.setExtend(
                                                 (int) MathUtil.putInRange(Constants.ExtendConstants.extendMinHeight,
-                                                        (int) ((RIGHTTRIGGER2 - LEFTTRIGGER2) * Constants.ExtendConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        (int) ((RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.ExtendConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
                                                         Constants.ExtendConstants.extendMaxHeight));
                                     }
 
@@ -382,41 +382,41 @@ public class StateTeleOp extends LinearOpMode {
                                 // Lifter Controls
 
                                 if(!arm.getState()) {
-                                    if (!MathUtil.isInRange(LEFTTRIGGER2, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER2, Constants.OtherConstants.joystickThreshold)) {
+                                    if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
                                         robot.setLifter(
                                                 (int) MathUtil.putInRange(Constants.LifterConstants.lifterMinHeight,
-                                                        (int) ((RIGHTTRIGGER2 - LEFTTRIGGER2) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        (int) ((RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
                                                         Constants.LifterConstants.lifterMaxHeight));
                                     }
                                     robot.setLifterArm(Constants.LifterConstants.liftArmTop);
                                     robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop);
                                 } else {
-                                    robot.setLifterArm(0.95f);
-                                    robot.setLifterWristPitch(.68f);
+                                    robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+                                    robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
                                 }
 
 
                                 // Wrist Controls
-                                if(X2) {
+                                if(X1) {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeft);
-                                } else if (A2) {
+                                } else if (B1) {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRight);
                                 } else {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
                                 }
 
                                 // Claw Controls
-                                if(RIGHTBUMPER2) {
+                                if(A1) {
                                     if (stateTimes.size() == 2) {
                                         stateTimes.add(stateTime.milliseconds());
                                         tempLastPosition = robot.lifter.currentClawPosition;
-                                    }
 
-                                    robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen);
+                                        robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen); // USED TO BE CLAW FULL OPEN AS OF 2/1/2024
+                                    }
                                 }
 
                                 if(stateTimes.size() == 3) {
-                                    if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS) + 4000) {
+                                    if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS) + 1000) {
                                         state = States.TRANSFER;
 
                                         arm.setState(false);
@@ -460,23 +460,23 @@ public class StateTeleOp extends LinearOpMode {
 
 
         // Gamepad 2
-        LY2 = -gamepad2.left_stick_y;
-
-        RY2 = gamepad2.right_stick_y;
-
-        LEFTTRIGGER2 = gamepad2.left_trigger;
-        RIGHTTRIGGER2 = gamepad2.right_trigger;
-
-        LEFTBUMPER2 = gamepad2.left_bumper;
-        RIGHTBUMPER2 = gamepad2.right_bumper;
-
-        A2 = gamepad2.a;
-        B2 = gamepad2.b;
-        Y2 = gamepad2.y;
-        X2 = gamepad2.x;
-
-        DPAD_UP2 = gamepad2.dpad_up;
-        DPAD_LEFT2 = gamepad2.dpad_left;
-        DPAD_DOWN2 = gamepad2.dpad_down;
+//        LY2 = -gamepad2.left_stick_y;
+//
+//        RY2 = gamepad2.right_stick_y;
+//
+//        LEFTTRIGGER2 = gamepad2.left_trigger;
+//        RIGHTTRIGGER2 = gamepad2.right_trigger;
+//
+//        LEFTBUMPER2 = gamepad2.left_bumper;
+//        RIGHTBUMPER2 = gamepad2.right_bumper;
+//
+//        A2 = gamepad2.a;
+//        B2 = gamepad2.b;
+//        Y2 = gamepad2.y;
+//        X2 = gamepad2.x;
+//
+//        DPAD_UP2 = gamepad2.dpad_up;
+//        DPAD_LEFT2 = gamepad2.dpad_left;
+//        DPAD_DOWN2 = gamepad2.dpad_down;
     }
 }

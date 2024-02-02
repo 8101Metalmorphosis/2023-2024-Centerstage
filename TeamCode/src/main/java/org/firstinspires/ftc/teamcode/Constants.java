@@ -22,6 +22,7 @@ public class Constants {
         public static float liftArmIdle = .4f;
         public static float liftArmTransfer = .128f;
         public static float liftArmTop = .85f;
+        public static float liftArmTop2 = .95f;
     }
 
     public static class ExtendConstants {
@@ -47,6 +48,7 @@ public class Constants {
     public static class ClawConstants {
         public static float wristPitchTransfer = 0.125f;
         public static float wristPitchDrop = .75f;
+        public static float wristPitchDrop2 = .68f;
 
         public static float wristRollVertical = .5f;
         public static float wristRollLeft = .85f;
