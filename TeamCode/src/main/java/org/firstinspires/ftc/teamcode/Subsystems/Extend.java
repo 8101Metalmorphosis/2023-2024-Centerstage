@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -27,6 +29,27 @@ public class Extend {
 
         extendArm = hardwareMap.get(Servo.class, "IntakePivot");
         intakeDoor = hardwareMap.get(Servo.class, "IntakeDoor");
+
+        extend.setDirection(DcMotorEx.Direction.REVERSE);
+    }
+
+    public void resetArm() {
+        extend.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        extend.setDirection(DcMotorEx.Direction.REVERSE);
+
+        extend.setPower(Constants.ExtendConstants.extendSpeed);
+
+        extend.setTargetPosition(Constants.ExtendConstants.extendMinHeight);
+
+        extend.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
+    }
+
+    public void zeroArm() {
+        extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        extend.setPower(Constants.ExtendConstants.extendZeroSpeed);
     }
 
     public void update() {
@@ -38,6 +61,7 @@ public class Extend {
 
     public void setExtendPosition(int ticks) {
         targetExtendPosition = ticks;
+
         extend.setTargetPosition(ticks);
     }
 

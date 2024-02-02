@@ -24,7 +24,7 @@ public class StateTeleOp extends LinearOpMode {
     ButtonToggleAdvanced antiTip;
 
 
-    ButtonToggle intake;
+    ButtonToggle arm;
     ButtonToggle transfer;
 
     // Gamepad 1
@@ -33,6 +33,9 @@ public class StateTeleOp extends LinearOpMode {
 
     double RX1;
 
+    boolean LEFTBUMPER1;
+    boolean RIGHTBUMPER1;
+
     double LEFTTRIGGER1;
     double RIGHTTRIGGER1;
 
@@ -40,8 +43,15 @@ public class StateTeleOp extends LinearOpMode {
     boolean B1;
 
     boolean Y1;
+    boolean X1;
     boolean BACK1;
 
+
+    boolean DPAD_UP1;
+    boolean DPAD_LEFT1;
+    boolean DPAD_DOWN1;
+
+    boolean START1;
 
     // Gamepad 2
     double LY2;
@@ -49,8 +59,11 @@ public class StateTeleOp extends LinearOpMode {
     double RY2;
 
 
-    boolean L2BUMPER;
-    boolean R2BUMPER;
+    boolean LEFTBUMPER2;
+    boolean RIGHTBUMPER2;
+
+    double LEFTTRIGGER2;
+    double RIGHTTRIGGER2;
 
 
     boolean A2;
@@ -58,10 +71,10 @@ public class StateTeleOp extends LinearOpMode {
     boolean Y2;
     boolean X2;
 
-
     boolean DPAD_UP2;
     boolean DPAD_LEFT2;
     boolean DPAD_DOWN2;
+
 
     public enum States {
         INTAKE,
@@ -81,7 +94,7 @@ public class StateTeleOp extends LinearOpMode {
 
         antiTip = new ButtonToggleAdvanced(ButtonToggleAdvanced.NEUTRAL_STATE);
 
-        intake = new ButtonToggle();
+        arm = new ButtonToggle();
         transfer = new ButtonToggle();
 
 
@@ -99,6 +112,14 @@ public class StateTeleOp extends LinearOpMode {
         robot.lifter.zeroArm();
 
         while(opModeInInit()) {
+
+            robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+            robot.setLifterWristRoll(Constants.ClawConstants.wristRollVertical);
+
+            robot.extend.closeIntakeDoor();
+            robot.setExtendArm(Constants.ExtendConstants.resetExtendArm);
+
 
             if((stateTime.milliseconds() > 500) && firstState){
                 robot.lifter.resetArm();
@@ -118,15 +139,13 @@ public class StateTeleOp extends LinearOpMode {
                 updateInputs();
 
                 // Controls
-                FOD.update(A1);
+                FOD.update(START1);
 
-                intake.update(Y2);
-                transfer.update(X2);
+                arm.update(LEFTBUMPER2);
 
 
                 // Update Robot
                 robot.updateDrive(LY1, LX1, RX1, FOD.getState(), false, alignAprilTag.getState(), antiTip);
-
 
 
                 if (DPAD_UP2 || DPAD_LEFT2 || DPAD_DOWN2) {
@@ -142,90 +161,92 @@ public class StateTeleOp extends LinearOpMode {
                     }
                 }
 
-                if(DPAD_UP2) {
-                    robot.setLifter(Constants.LifterConstants.lifterMaxHeight);
-                } else if (DPAD_DOWN2) {
-                    robot.setLifter(Constants.LifterConstants.lifterMinHeight);
-                }
-
-
                 // Transfer State Machine
 
-
-
                 switch(state) {
-//
-//                    case INTAKE:
-//
-//                        if(firstState) {
-//                            stateTime = new ElapsedTime();
-//
-//                            robot.setLifter(Constants.LifterConstants.lifterZeroOffset);
-//                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
-//                            robot.lifter.clawOpen();
-//
-//                            robot.setExtend(robot.extend.currentExtendPosition);
-//                            robot.setIntake(0);
-//
-//
-//                            tempLastPosition = robot.lifter.currentArmPosition;
-//
-//                            firstState = false;
-//                        }
-//
-//
-//                        // Move arm to intake position
-//                        if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmIntake &&
-//                                ((stateTimes.size() > 0) || (stateTime.milliseconds() >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS)))) {
-//                            // Update Timer
-//                            if(stateTimes.size() == 0) {
-//                                stateTimes.add(stateTime.milliseconds());
-//                                tempLastPosition = robot.extend.currentIntakeDoorPosition;
-//                            }
-//
-//                            // Close Door
-//                            if(robot.extend.currentIntakeDoorPosition == Constants.IntakeConstants.doorClose &&
-//                                    ((stateTimes.size() > 1) || (stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS)))) {
-//                                // Update Timer
-//                                if(stateTimes.size() == 1) {
-//                                    stateTimes.add(stateTime.milliseconds());
-//                                    tempLastPosition = robot.extend.currentArmPosition;
-//                                }
-//
-//                                // Pivot Intake
-//                                if(robot.extend.currentArmPosition == Constants.ExtendConstants.intakeExtendArm &&
-//                                        ((stateTimes.size() > 2) || (stateTime.milliseconds() - (double) (stateTimes.get(1)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentArmPosition, Constants.TimerConstants.extendArmTimeMS)))) {
-//                                    // Update Timer
-//                                    if(stateTimes.size() == 2) {
-//                                        stateTimes.add(stateTime.milliseconds());
-//                                    }
-//
-//                                    // MANUAL CONTROLS
-//                                        // Extend Controls
-//                                    if (!MathUtil.isInRange(LY2, Constants.OtherConstants.joystickThreshold)) {
-//                                        robot.setExtend((int) (LY2 * Constants.ExtendConstants.maxTicksPerLoop) + (robot.extend.currentExtendPosition));
-//                                    }
-//
-//                                        // Intake Controls
-//                                    if(LEFTTRIGGER1 > Constants.OtherConstants.triggerThreshhold) {
-//                                        robot.setIntake(-Constants.IntakeConstants.intakeSpeed);
-//                                    } else if (RIGHTTRIGGER1 > Constants.OtherConstants.triggerThreshhold) {
-//                                        robot.setIntake(Constants.IntakeConstants.intakeSpeed);
-//                                    } else {
-//                                        robot.setIntake(0);
-//                                    }
-//                                } else {
-//                                    robot.extend.pivotArmDown();
-//                                }
-//                            } else {
-//                                robot.extend.closeIntakeDoor();
-//                            }
-//                        } else {
-//                            robot.setLifterArm(Constants.LifterConstants.liftArmIntake);
-//                        }
-//
-//
+
+                    case INTAKE:
+
+                        if(firstState) {
+                            stateTime = new ElapsedTime();
+
+                            robot.setLifter(Constants.LifterConstants.lifterMinHeight);
+                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+                            robot.lifter.clawOpen();
+
+                            robot.setExtend(robot.extend.currentExtendPosition);
+                            robot.setIntake(0);
+
+
+                            tempLastPosition = robot.lifter.currentArmPosition;
+
+                            firstState = false;
+                        }
+
+
+                        // Move arm to intake position
+                        if((robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmIdle &&
+                                (stateTime.milliseconds() >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS))) ||
+                                ((stateTimes.size() > 0))) {
+                            // Update Timer
+                            if(stateTimes.size() == 0) {
+                                stateTimes.add(stateTime.milliseconds());
+                                tempLastPosition = robot.extend.currentIntakeDoorPosition;
+                            }
+
+                            // Close Door
+                            if((robot.extend.currentIntakeDoorPosition == Constants.IntakeConstants.doorClose &&
+                                    (stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS))) ||
+                                ((stateTimes.size() > 1))) {
+                                // Update Timer
+                                if(stateTimes.size() == 1) {
+                                    stateTimes.add(stateTime.milliseconds());
+                                    tempLastPosition = robot.extend.currentArmPosition;
+                                }
+
+                                // Pivot Intake
+                                if((robot.extend.currentArmPosition == Constants.ExtendConstants.intakeExtendArm &&
+                                        (stateTime.milliseconds() - (double) (stateTimes.get(1)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentArmPosition, Constants.TimerConstants.extendArmTimeMS))) ||
+                                        ((stateTimes.size() > 2))) {
+                                    // Update Timer
+                                    if(stateTimes.size() == 2) {
+                                        stateTimes.add(stateTime.milliseconds());
+                                    }
+
+                                    robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+
+                                    // MANUAL CONTROLS
+                                        // Extend Controls
+                                    if (!MathUtil.isInRange(LEFTTRIGGER2, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER2, Constants.OtherConstants.joystickThreshold)) {
+                                        robot.setExtend(
+                                                (int) MathUtil.putInRange(Constants.ExtendConstants.extendMinHeight,
+                                                        (int) ((RIGHTTRIGGER2 - LEFTTRIGGER2) * Constants.ExtendConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        Constants.ExtendConstants.extendMaxHeight));
+                                    }
+
+                                        // Intake Controls
+                                    if(LEFTBUMPER1) {
+                                        robot.setIntake(-Constants.IntakeConstants.intakeSpeed);
+                                    } else if (RIGHTBUMPER1) {
+                                        robot.setIntake(Constants.IntakeConstants.intakeSpeed);
+                                    } else {
+                                        robot.setIntake(0);
+                                    }
+                                } else {
+                                    robot.extend.pivotArmDown();
+                                }
+                            } else {
+                                robot.extend.closeIntakeDoor();
+                            }
+                        } else {
+                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+                        }
+                    break;
+
+
+
                     case TRANSFER:
+
 
                         if(firstState) {
                             stateTime = new ElapsedTime();
@@ -245,8 +266,9 @@ public class StateTeleOp extends LinearOpMode {
                         }
 
 
-                        if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmIntake &&
-                                ((stateTimes.size() > 0) || (stateTime.milliseconds() >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS)))) {
+                        if((robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmIdle &&
+                                stateTime.milliseconds() >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS)) ||
+                                (stateTimes.size() > 0)) {
                             // Update Timer
                             if (stateTimes.size() == 0) {
                                 stateTimes.add(stateTime.milliseconds());
@@ -261,8 +283,9 @@ public class StateTeleOp extends LinearOpMode {
                                 }
 
                                 // Pivot Intake
-                                if (robot.extend.currentArmPosition == Constants.ExtendConstants.resetExtendArm &&
-                                        ((stateTimes.size() > 2) || (stateTime.milliseconds() - (double) (stateTimes.get(1)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentArmPosition, Constants.TimerConstants.extendArmTimeMS)))) {
+                                if ((robot.extend.currentArmPosition == Constants.ExtendConstants.resetExtendArm &&
+                                        stateTime.milliseconds() - (double) (stateTimes.get(1)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentArmPosition, Constants.TimerConstants.extendArmTimeMS)) ||
+                                        (stateTimes.size() > 2)) {
                                     // Update Timer
                                     if (stateTimes.size() == 2) {
                                         stateTimes.add(stateTime.milliseconds());
@@ -270,8 +293,9 @@ public class StateTeleOp extends LinearOpMode {
                                     }
 
                                     // Open Door
-                                    if(robot.extend.currentIntakeDoorPosition == Constants.IntakeConstants.doorOpen &&
-                                            ((stateTimes.size() > 3) || (stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS)))) {
+                                    if((robot.extend.currentIntakeDoorPosition == Constants.IntakeConstants.doorOpen &&
+                                            (stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS))) ||
+                                            (stateTimes.size() > 3)) {
                                         // Update Timer
                                         if (stateTimes.size() == 3) {
                                             stateTimes.add(stateTime.milliseconds());
@@ -279,8 +303,9 @@ public class StateTeleOp extends LinearOpMode {
                                         }
 
                                         // Move Arm to Transfer
-                                        if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmReset &&
-                                                ((stateTimes.size() > 4) || (stateTime.milliseconds() - (double) (stateTimes.get(3)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS)))) {
+                                        if((robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmTransfer &&
+                                                (stateTime.milliseconds() - (double) (stateTimes.get(3)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS))) ||
+                                                (stateTimes.size() > 4)) {
                                             // Update Timer
                                             if (stateTimes.size() == 4) {
                                                 stateTimes.add(stateTime.milliseconds());
@@ -290,95 +315,119 @@ public class StateTeleOp extends LinearOpMode {
                                             // STATE MACHINE READY
 
                                         } else {
-                                            robot.lifter.setArmPosition(Constants.LifterConstants.liftArmReset);
+                                            robot.lifter.setArmPosition(Constants.LifterConstants.liftArmTransfer);
                                         }
                                     } else {
                                         robot.extend.openIntakeDoor();
                                     }
                                 } else {
-                                    robot.setLifterArm(Constants.LifterConstants.liftArmIntake);
+                                    robot.setExtendArm(Constants.ExtendConstants.resetExtendArm);
                                 }
                             } else {
-                                robot.setExtend(Constants.ExtendConstants.extendZeroOffset);
+                                robot.setExtend(Constants.ExtendConstants.extendMinHeight);
                             }
+                        } else {
+                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
                         }
-//
-//
-//                    case PLACE:
-//                        if(firstState) {
-//                            stateTime = new ElapsedTime();
-//
-//                            robot.setLifter(Constants.LifterConstants.lifterZeroOffset);
-//                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
-//                            robot.lifter.clawOpen();
-//
-//                            robot.setExtend(robot.extend.currentExtendPosition);
-//                            robot.setIntake(0);
-//
-//                            firstState = false;
-//                        }
-//
-//                        // if needs to run through state machine
-//                        if (stateTimes.size() != 2 && stateTimes.size() != 3) {
-//                            // Close Claw
-//                            if(robot.lifter.currentClawPosition == Constants.ClawConstants.clawClose) {
-//                                // Update Timer
-//                                if (stateTimes.size() == 0) {
-//                                    stateTimes.add(stateTime.milliseconds());
-//                                    tempLastPosition = robot.lifter.currentArmPosition;
-//                                }
-//
-//                                // Rotate Arm to main position
-//                                if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmTop && stateTime.milliseconds() - (double) (stateTimes.get(0)) >= 250 && stateTimes.size() == 1) {
-//                                    if ((stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS))) {
-//
-//                                        // Update Timer
-//                                        if (stateTimes.size() == 1) {
-//                                            stateTimes.add(stateTime.milliseconds());
-//                                        }
-//
-//                                    } else {
-//                                        robot.lifter.setWristPitchPosition(Constants.ClawConstants.wristPitchDrop);
-//                                    }
-//                                } else {
-//                                    robot.lifter.setArmPosition(Constants.LifterConstants.liftArmTop);
-//                                }
-//                            } else {
-//                                robot.lifter.clawClose();
-//                            }
-//                        } else {
-//                            // MANUAL CONTROLS
-//                                // Lifter Controls
-//                            if (!MathUtil.isInRange(LY2, Constants.OtherConstants.joystickThreshold)) {
-//                                robot.setLifter((int) (LY2 * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition));
-//                            }
-//
-//                                // Wrist Controls
-//                            if(L2BUMPER) {
-//                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeft);
-//                            } else if (R2BUMPER) {
-//                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRight);
-//                            } else {
-//                                robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
-//                            }
-//
-//                                // Claw Controls
-//                            if(A2) {
-//                                if (stateTimes.size() == 2) {
-//                                    stateTimes.add(stateTime.milliseconds());
-//                                    tempLastPosition = robot.lifter.currentClawPosition;
-//                                }
-//
-//                                robot.lifter.clawOpen();
-//                            }
-//
-//                            if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS)) {
-//                                state = States.TRANSFER;
-//
-//                                firstState = true;
-//                                stateTimes = new ArrayList<>();
-//                            }
-//                        }
+
+                    break;
+
+
+
+                    case PLACE:
+                            if(firstState) {
+                                stateTime = new ElapsedTime();
+
+                                robot.setLifter(Constants.LifterConstants.lifterMinHeight);
+                                robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+                                robot.lifter.clawClose();
+
+                                robot.setExtend(robot.extend.currentExtendPosition);
+                                robot.setIntake(0);
+
+                                firstState = false;
+                            }
+
+                            // if needs to run through state machine
+                            if (stateTimes.size() != 2 && stateTimes.size() != 3) {
+                                // Close Claw
+                                if(robot.lifter.currentClawPosition == Constants.ClawConstants.clawClose) {
+                                    // Update Timer
+                                    if (stateTimes.size() == 0) {
+                                        stateTimes.add(stateTime.milliseconds());
+                                        tempLastPosition = robot.lifter.currentArmPosition;
+                                    }
+
+                                    // Rotate Arm to main position
+                                    if(robot.lifter.currentArmPosition == Constants.LifterConstants.liftArmTop && stateTime.milliseconds() - (double) (stateTimes.get(0)) >= 250 && stateTimes.size() == 1) {
+                                        if ((stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentArmPosition, Constants.TimerConstants.liftArmTimeMS))) {
+                                            robot.lifter.setWristPitchPosition(Constants.ClawConstants.wristPitchDrop);
+
+                                            // Update Timer
+                                            if (stateTimes.size() == 1) {
+                                                stateTimes.add(stateTime.milliseconds());
+                                            }
+
+                                        } else {
+                                            robot.lifter.setWristPitchPosition(Constants.ClawConstants.wristPitchDrop);
+                                        }
+                                    } else {
+                                        robot.lifter.setArmPosition(Constants.LifterConstants.liftArmTop);
+                                    }
+                                } else {
+                                    robot.lifter.clawClose();
+                                }
+                            } else {
+                                // MANUAL CONTROLS
+                                // Lifter Controls
+
+                                if(!arm.getState()) {
+                                    if (!MathUtil.isInRange(LEFTTRIGGER2, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER2, Constants.OtherConstants.joystickThreshold)) {
+                                        robot.setLifter(
+                                                (int) MathUtil.putInRange(Constants.LifterConstants.lifterMinHeight,
+                                                        (int) ((RIGHTTRIGGER2 - LEFTTRIGGER2) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        Constants.LifterConstants.lifterMaxHeight));
+                                    }
+                                    robot.setLifterArm(Constants.LifterConstants.liftArmTop);
+                                    robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop);
+                                } else {
+                                    robot.setLifterArm(0.95f);
+                                    robot.setLifterWristPitch(.68f);
+                                }
+
+
+                                // Wrist Controls
+                                if(X2) {
+                                    robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeft);
+                                } else if (A2) {
+                                    robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRight);
+                                } else {
+                                    robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
+                                }
+
+                                // Claw Controls
+                                if(RIGHTBUMPER2) {
+                                    if (stateTimes.size() == 2) {
+                                        stateTimes.add(stateTime.milliseconds());
+                                        tempLastPosition = robot.lifter.currentClawPosition;
+                                    }
+
+                                    robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen);
+                                }
+
+                                if(stateTimes.size() == 3) {
+                                    if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS) + 4000) {
+                                        state = States.TRANSFER;
+
+                                        arm.setState(false);
+
+                                        firstState = true;
+                                        stateTimes = new ArrayList<>();
+                                    }
+                                }
+                            }
+
+                    break;
                 }
                 robot.update();
             }
@@ -397,20 +446,29 @@ public class StateTeleOp extends LinearOpMode {
         B1 = gamepad1.b;
 
         Y1 = gamepad1.y;
+        X1 = gamepad1.x;
 
         BACK1 = gamepad1.back;
+        START1 = gamepad1.start;
+
+        LEFTBUMPER1 = gamepad1.left_bumper;
+        RIGHTBUMPER1 = gamepad1.right_bumper;
+
+        DPAD_UP1 = gamepad1.dpad_up;
+        DPAD_LEFT1 = gamepad1.dpad_left;
+        DPAD_DOWN1 = gamepad1.dpad_down;
 
 
         // Gamepad 2
-        LY2 = -gamepad1.left_stick_y;
+        LY2 = -gamepad2.left_stick_y;
 
         RY2 = gamepad2.right_stick_y;
 
-        LEFTTRIGGER1 = gamepad1.left_trigger;
-        RIGHTTRIGGER1 = gamepad1.right_trigger;
+        LEFTTRIGGER2 = gamepad2.left_trigger;
+        RIGHTTRIGGER2 = gamepad2.right_trigger;
 
-        L2BUMPER = gamepad2.left_bumper;
-        R2BUMPER = gamepad2.right_bumper;
+        LEFTBUMPER2 = gamepad2.left_bumper;
+        RIGHTBUMPER2 = gamepad2.right_bumper;
 
         A2 = gamepad2.a;
         B2 = gamepad2.b;
