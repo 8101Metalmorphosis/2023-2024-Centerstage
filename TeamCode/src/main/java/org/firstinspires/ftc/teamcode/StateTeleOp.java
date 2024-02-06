@@ -86,7 +86,7 @@ public class StateTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new RobotBase(hardwareMap);
+        robot = new RobotBase(hardwareMap, true);
 
         // BUTTON TOGGLES
         FOD = new ButtonToggle();
@@ -213,7 +213,7 @@ public class StateTeleOp extends LinearOpMode {
                                         stateTimes.add(stateTime.milliseconds());
                                     }
 
-                                    robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+                                    robot.setLifterArm(Constants.LifterConstants.liftArmIntake);
 
                                     // MANUAL CONTROLS
                                         // Extend Controls
@@ -385,7 +385,7 @@ public class StateTeleOp extends LinearOpMode {
                                     if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
                                         robot.setLifter(
                                                 (int) MathUtil.putInRange(Constants.LifterConstants.lifterMinHeight,
-                                                        (int) ((RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        (int) (((double) (RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition)),
                                                         Constants.LifterConstants.lifterMaxHeight));
                                     }
                                     robot.setLifterArm(Constants.LifterConstants.liftArmTop);
@@ -411,7 +411,7 @@ public class StateTeleOp extends LinearOpMode {
                                         stateTimes.add(stateTime.milliseconds());
                                         tempLastPosition = robot.lifter.currentClawPosition;
 
-                                        robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen); // USED TO BE CLAW FULL OPEN AS OF 2/1/2024
+                                        robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen); // USED TO BE CLAW FULL OPEN AS OF 2/1/2024
                                     }
                                 }
 
@@ -453,6 +453,9 @@ public class StateTeleOp extends LinearOpMode {
 
         LEFTBUMPER1 = gamepad1.left_bumper;
         RIGHTBUMPER1 = gamepad1.right_bumper;
+
+        LEFTTRIGGER1 = gamepad1.left_trigger;
+        RIGHTTRIGGER1 = gamepad1.right_trigger;
 
         DPAD_UP1 = gamepad1.dpad_up;
         DPAD_LEFT1 = gamepad1.dpad_left;

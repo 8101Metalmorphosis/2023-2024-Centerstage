@@ -34,10 +34,13 @@ public class RobotBase {
     List<LynxModule> allHubs;
 
 
-    public RobotBase(HardwareMap hardwareMap) {
+    public RobotBase(HardwareMap hardwareMap, boolean teleop) {
         this.hardwareMap = hardwareMap;
 
-        drive = new MecanumDrive(hardwareMap);
+        if(teleop) {
+            drive = new MecanumDrive(hardwareMap);
+        }
+
         lifter = new Lifter(hardwareMap);
         extend = new Extend(hardwareMap);
 

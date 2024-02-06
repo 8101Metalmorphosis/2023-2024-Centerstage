@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OLD;
+package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -9,7 +9,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class BluePipeline extends OpenCvPipeline {
+public class RedPipeline extends OpenCvPipeline {
 
     Telemetry telemetry;
 
@@ -19,25 +19,25 @@ public class BluePipeline extends OpenCvPipeline {
     double targetPercent = .06;
 
     public enum Location {
-        RIGHT,
+        LEFT,
         MIDDLE,
-        LEFT
+        RIGHT
     }
 
     public Location location;
 
 
-    public BluePipeline(Telemetry t) {telemetry = t;}
+    public RedPipeline(Telemetry t) {telemetry = t;}
 
 
     static final Rect LEFT = new Rect(
-            new Point(70, 380),
-            new Point(220, 465)
+            new Point(300, 50),
+            new Point(520, 300)
     );
 
     static final Rect MIDDLE = new Rect(
-            new Point(300, 350),
-            new Point(450, 465)
+        new Point(0, 50),
+        new Point(280, 300)
     );
 
     @Override
@@ -46,10 +46,12 @@ public class BluePipeline extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, output, Imgproc.COLOR_RGB2HSV);
 
-        Scalar[] BlueScalar = {new Scalar(99, 64, 30), new Scalar(147, 255, 236)};
+        Scalar[] RedScalar = {new Scalar(170, 100, 30), new Scalar(180, 255, 255)};
+//        Scalar[] BlueScalar = {new Scalar(99, 64, 133), new Scalar(147, 255, 236)};
 
 
-        Core.inRange(output, BlueScalar[0], BlueScalar[1], output);
+        Core.inRange(output, RedScalar[0], RedScalar[1], output);
+//        Core.inRange(output, BlueScalar[0], BlueScalar[1], output);
 
         Mat middleMat = output.submat(MIDDLE);
         Mat leftMat = output.submat(LEFT);
@@ -84,7 +86,7 @@ public class BluePipeline extends OpenCvPipeline {
         middleMat.release();
         leftMat.release();
 
-        return output;
+        return input;
     }
 
     public Location getLocation() {

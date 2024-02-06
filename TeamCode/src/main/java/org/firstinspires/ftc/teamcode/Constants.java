@@ -12,7 +12,7 @@ public class Constants {
         public static float lifterSpeed = .7f;
         public static float lifterZeroSpeed = -.2f;
 
-        public static int lifterMaxHeight = 2000;
+        public static int lifterMaxHeight = 2400;
         public static int lifterMinHeight = 30;
 
 
@@ -20,7 +20,9 @@ public class Constants {
 
 
         public static float liftArmIdle = .4f;
+        public static float liftArmIntake = .133f;
         public static float liftArmTransfer = .128f;
+
         public static float liftArmTop = .85f;
         public static float liftArmTop2 = .95f;
     }
@@ -63,7 +65,7 @@ public class Constants {
         // ALL TIMERS ARE PER .5 ROTATION
 
         // Lifter
-        public static int liftArmTimeMS = 250;
+        public static int liftArmTimeMS = 100;
         public static int wristTimeMS = 500;
         public static int clawTimeMS = 2500;
 
