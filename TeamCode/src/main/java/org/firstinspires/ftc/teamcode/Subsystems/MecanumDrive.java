@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.OLD.Constants.*;
 import org.firstinspires.ftc.teamcode.FTCutil.ButtonToggleAdvanced;
 import org.firstinspires.ftc.teamcode.FTCutil.MathUtil;
 import org.firstinspires.ftc.teamcode.FTCutil.PID.PIDController;
-import org.firstinspires.ftc.teamcode.NikoRunner.library.Vector2d;
+import org.firstinspires.ftc.teamcode.OLD.NikoRunner.library.Vector2d;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -65,15 +66,15 @@ public class MecanumDrive {
             for (AprilTagDetection detection : currentDetections) {
                 if (detection.metadata != null) {
                     if(side.getState() == ButtonToggleAdvanced.OFF_STATE) { // RED SIDE
-                        if(detection.id == AprilTags.ID_REDALLIANCE_WALLSMALL) {
+                        if(detection.id == Constants.AprilTags.ID_REDALLIANCE_WALLSMALL) {
                             alignToTag(detection);
-                        } else if(detection.id == AprilTags.ID_REDALLIANCE_CENTER) {
+                        } else if(detection.id == Constants.AprilTags.ID_REDALLIANCE_CENTER) {
                             alignToTag(detection);
                         }
                     } else if (side.getState() == ButtonToggleAdvanced.ON_STATE) { // BLUE SIDE
-                        if(detection.id == AprilTags.ID_BLUEALLIANCE_WALLSMALL) {
+                        if(detection.id == Constants.AprilTags.ID_BLUEALLIANCE_WALLSMALL) {
                             alignToTag(detection);
-                        } else if(detection.id == AprilTags.ID_BLUEALLIANCE_CENTER) {
+                        } else if(detection.id ==  Constants.AprilTags.ID_BLUEALLIANCE_CENTER) {
                             alignToTag(detection);
                         }
                     } else {

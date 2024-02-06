@@ -28,12 +28,14 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,6 +79,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private IMU imu;
     private VoltageSensor batteryVoltageSensor;
+
+
+    public List<AprilTagDetection> currentDetections;
+
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
@@ -155,6 +161,42 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
+
+
+    public void alignToTag(AprilTagDetection detection) {
+        double targetDistance = 8;
+
+        double DISTANCE_GAIN = 0.036;
+        double STRAFE_GAIN = 0.02;
+        double TURN_GAIN = 0.025;
+
+        double MAX_DRIVE_SPEED = .4;
+        double MAX_STRAFE_SPEED = .2;
+        double MAX_TURN_SPEED = .1;
+
+        // DRIVE
+        double rangeError = detection.ftcPose.range - targetDistance;
+        double rangeValue = Range.clip(rangeError * DISTANCE_GAIN, -MAX_DRIVE_SPEED, MAX_DRIVE_SPEED);
+
+        // STRAFE
+        double yawError = detection.ftcPose.yaw;
+        double yawValue = Range.clip(-yawError * STRAFE_GAIN, -MAX_STRAFE_SPEED, MAX_STRAFE_SPEED);
+
+        // TURN
+        double headingError = detection.ftcPose.bearing;
+        double headingValue = Range.clip(headingError * TURN_GAIN, -MAX_TURN_SPEED, MAX_TURN_SPEED);
+
+        leftFront.setPower(-rangeValue + yawValue - headingValue);
+        rightFront.setPower(-rangeValue - yawValue + headingValue);
+        leftRear.setPower(-rangeValue - yawValue - headingValue);
+        rightRear.setPower(-rangeValue + yawValue + headingValue);
+    }
+
+    public List<AprilTagDetection> getAprilTags() {
+        return currentDetections;
+    }
+
+
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);

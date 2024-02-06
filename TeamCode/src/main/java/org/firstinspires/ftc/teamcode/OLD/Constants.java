@@ -41,16 +41,5 @@ public class Constants {
 
     }
 
-    public static class AprilTags {
 
-        public static final int ID_BLUEALLIANCE_WALLSMALL = 9;
-        public static final int ID_BLUEALLIANCE_LEFT = 1;
-        public static final int ID_BLUEALLIANCE_CENTER = 2;
-        public static final int ID_BLUEALLIANCE_RIGHT = 3;
-
-        public static final int ID_REDALLIANCE_WALLSMALL = 8;
-        public static final int ID_REDALLIANCE_LEFT = 4;
-        public static final int ID_REDALLIANCE_CENTER = 5;
-        public static final int ID_REDALLIANCE_RIGHT = 6;
-    }
 }

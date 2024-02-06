@@ -1,28 +1,27 @@
-package org.firstinspires.ftc.teamcode.NikoRunner.library;
+package org.firstinspires.ftc.teamcode.OLD.NikoRunner.library;
 
 import java.util.ArrayList;
 
-public class Spline2d {
+public class Line2d {
     ArrayList<Vector2d> pointList;
     Rotation2d targetRotation;
     String type;
 
-    public Spline2d(ArrayList<Vector2d> pointList, Rotation2d targetRotation, String type) {
+    public Line2d(ArrayList<Vector2d> pointList, Rotation2d targetRotation, String type) {
         this.pointList = pointList;
         this.targetRotation = targetRotation;
         this.type = type;
-    }
-
-    public ArrayList<Vector2d> getPoints() {
-        return pointList;
     }
 
     public Pose2d getEndPose() {
         return new Pose2d(pointList.get(pointList.size()), targetRotation);
     }
 
-    public Rotation2d getEndRotation() {
+    public Rotation2d getTargetRotation2d() {
         return targetRotation;
     }
-    
+
+    public String getType() {
+        return type;
+    }
 }
