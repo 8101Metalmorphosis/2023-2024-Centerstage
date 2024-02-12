@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous.Blue;
 
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -8,14 +8,16 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Vision.BluePipeline;
 import org.firstinspires.ftc.teamcode.Subsystems.RobotBase;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "BlueRightAutonomous", group = "!")
-public class BlueRightAutonomous extends LinearOpMode {
+@Autonomous(name = "BlueBackdropAutonomous", group = "! b")
+public class BlueBackdropAutonomous extends LinearOpMode {
 
     RobotBase robot;
 
@@ -51,7 +53,7 @@ public class BlueRightAutonomous extends LinearOpMode {
 
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(16, 60, Math.toRadians(-90));
+        Pose2d startPose = new Pose2d(17, 63, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
 
@@ -60,23 +62,22 @@ public class BlueRightAutonomous extends LinearOpMode {
                     robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
                 })
 
-                .addSpatialMarker(new Vector2d(20, 30), () -> {
+                .addDisplacementMarker(8, () -> {
                     robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
                 })
-                .lineToSplineHeading(new Pose2d(38, 31, Math.toRadians(180 - (1e-6))))
+                .lineToSplineHeading(new Pose2d(30, 26, Math.toRadians(-179.9)))
                 .build();
 
-        Trajectory left =  drive.trajectoryBuilder(traj1.end(), true)
-                .lineToConstantHeading(new Vector2d(31, 37))
+        Trajectory left =  drive.trajectoryBuilder(traj1.end())
+                .lineToConstantHeading(new Vector2d(18, 32))
                 .build();
 
         Trajectory middle =  drive.trajectoryBuilder(traj1.end())
-                .lineToConstantHeading(new Vector2d(25, 28))
+                .lineToConstantHeading(new Vector2d(32, 26))
                 .build();
 
-        Trajectory right =  drive.trajectoryBuilder(traj1.end())
-                .lineToConstantHeading(new Vector2d(11.25, 29))
-
+        Trajectory right =  drive.trajectoryBuilder(traj1.end(), true)
+                .lineToConstantHeading(new Vector2d(41, 30))
                 .build();
 
         int spike = 2;
@@ -90,16 +91,16 @@ public class BlueRightAutonomous extends LinearOpMode {
 
             switch (detector.getLocation()) {
                 case LEFT:
-                    spike = 1;
-                    telemetry.addData("Spike", "1");
+                    spike = 3;
+                    telemetry.addData("Spike", "3");
                     break;
                 case MIDDLE:
                     spike = 2;
                     telemetry.addData("Spike", "2");
                     break;
                 case RIGHT:
-                    spike = 3;
-                    telemetry.addData("Spike", "3");
+                    spike = 1;
+                    telemetry.addData("Spike", "1");
                     break;
             }
 
@@ -119,9 +120,9 @@ public class BlueRightAutonomous extends LinearOpMode {
                         .addDisplacementMarker(2, () -> {
                             robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
-                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
+                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
                         })
-                        .lineToConstantHeading(new Vector2d(38, 41.5))
+                        .lineToConstantHeading(new Vector2d(45.5, 34))
                         .build();
             } else if (spike == 2) {
                 drive.followTrajectory(middle);
@@ -129,42 +130,48 @@ public class BlueRightAutonomous extends LinearOpMode {
                         .addDisplacementMarker(2, () -> {
                             robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
-                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
+                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                         })
-                        .lineToConstantHeading(new Vector2d(38, 44))
+                        .lineToConstantHeading(new Vector2d(45.5, 38))
                         .build();
-
             } else if (spike == 3) {
                 drive.followTrajectory(right);
                 traj2 = drive.trajectoryBuilder(drive.getPoseEstimate())
                         .addDisplacementMarker(2, () -> {
                             robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
-                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
+                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                         })
-                        .lineToConstantHeading(new Vector2d(36, 41.5))
+                        .lineToConstantHeading(new Vector2d(45.5, 42))
                         .build();
             }
 
-            robot.setExtendArm((float) (Constants.ExtendConstants.intakeExtendArm + .2));
+            robot.setExtendArm((float) (Constants.ExtendConstants.intakeExtendArm + .3));
             sleep(100);
             robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
-            robot.setIntake(-.2f);
-
-            sleep(2500);
+            sleep(100);
+            robot.setExtendArm((float) (Constants.ExtendConstants.intakeExtendArm + .3));
+            sleep(100);
+            robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
+            robot.setIntake(Constants.IntakeConstants.autoOuttakeSpeed);
+            sleep(1000);
             drive.followTrajectory(traj2);
             robot.setIntake(0);
-            robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen);
-            sleep(500);
+            robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen);
+            sleep(250);
+            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd);
+            sleep(250);
             robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
-            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
-            sleep(2500);
+            sleep(250);
 
             Trajectory traj3 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToConstantHeading(new Vector2d(40, 68))
+                    .lineToConstantHeading(new Vector2d(48, 66))
                     .build();
             drive.followTrajectory(traj3);
-//            drive.followTrajectory();
+            Trajectory traj4 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                    .back(12)
+                    .build();
+            drive.followTrajectory(traj4);
         }
     }
 }

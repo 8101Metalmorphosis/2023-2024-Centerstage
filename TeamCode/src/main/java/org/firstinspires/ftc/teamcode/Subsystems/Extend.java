@@ -31,6 +31,8 @@ public class Extend {
         intakeDoor = hardwareMap.get(Servo.class, "IntakeDoor");
 
         extend.setDirection(DcMotorEx.Direction.REVERSE);
+
+//        resetArm();
     }
 
     public void resetArm() {

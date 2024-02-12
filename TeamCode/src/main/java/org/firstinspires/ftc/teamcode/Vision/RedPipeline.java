@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Vision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -31,8 +31,8 @@ public class RedPipeline extends OpenCvPipeline {
 
 
     static final Rect LEFT = new Rect(
-            new Point(300, 50),
-            new Point(520, 300)
+            new Point(300, 100),
+            new Point(560, 325)
     );
 
     static final Rect MIDDLE = new Rect(

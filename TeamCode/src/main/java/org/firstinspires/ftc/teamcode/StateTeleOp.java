@@ -104,6 +104,8 @@ public class StateTeleOp extends LinearOpMode {
 
         double tempLastPosition = 0;
 
+        double turnMultiplier = 1;
+
 
         States state = States.NONE;
 
@@ -145,7 +147,7 @@ public class StateTeleOp extends LinearOpMode {
 
 
                 // Update Robot
-                robot.updateDrive(LY1, LX1, RX1, FOD.getState(), false, alignAprilTag.getState(), antiTip);
+                robot.updateDrive(LY1, LX1, RX1 * turnMultiplier, FOD.getState(), false, alignAprilTag.getState(), antiTip);
 
 
                 if (DPAD_UP1 || DPAD_LEFT1 || DPAD_DOWN1) {
@@ -170,8 +172,12 @@ public class StateTeleOp extends LinearOpMode {
                         if(firstState) {
                             stateTime = new ElapsedTime();
 
+                            turnMultiplier = 1;
+
                             robot.setLifter(Constants.LifterConstants.lifterMinHeight);
+                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollVertical);
                             robot.lifter.clawOpen();
 
                             robot.setExtend(robot.extend.currentExtendPosition);
@@ -196,7 +202,7 @@ public class StateTeleOp extends LinearOpMode {
 
                             // Close Door
                             if((robot.extend.currentIntakeDoorPosition == Constants.IntakeConstants.doorClose &&
-                                    (stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS))) ||
+                                    (stateTime.milliseconds() - (double) (stateTimes.get(0)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.extend.currentIntakeDoorPosition, Constants.TimerConstants.doorTimeMS + 150))) ||
                                 ((stateTimes.size() > 1))) {
                                 // Update Timer
                                 if(stateTimes.size() == 1) {
@@ -220,8 +226,14 @@ public class StateTeleOp extends LinearOpMode {
                                     if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
                                         robot.setExtend(
                                                 (int) MathUtil.putInRange(Constants.ExtendConstants.extendMinHeight,
-                                                        (int) ((RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.ExtendConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition),
+                                                        (int) (((RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.ExtendConstants.maxTicksPerLoop) + (robot.extend.currentExtendPosition)),
                                                         Constants.ExtendConstants.extendMaxHeight));
+                                    }
+
+                                    if(robot.extend.currentExtendPosition >= 1250) {
+                                        turnMultiplier = .5;
+                                    } else {
+                                        turnMultiplier = 1;
                                     }
 
                                         // Intake Controls
@@ -250,6 +262,8 @@ public class StateTeleOp extends LinearOpMode {
 
                         if(firstState) {
                             stateTime = new ElapsedTime();
+
+                            turnMultiplier = 1;
 
                             robot.setLifter(Constants.LifterConstants.lifterMinHeight);
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
@@ -338,6 +352,8 @@ public class StateTeleOp extends LinearOpMode {
                             if(firstState) {
                                 stateTime = new ElapsedTime();
 
+                                turnMultiplier = .5;
+
                                 robot.setLifter(Constants.LifterConstants.lifterMinHeight);
                                 robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
                                 robot.lifter.clawClose();
@@ -389,10 +405,15 @@ public class StateTeleOp extends LinearOpMode {
                                                         Constants.LifterConstants.lifterMaxHeight));
                                     }
                                     robot.setLifterArm(Constants.LifterConstants.liftArmTop);
-                                    robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop);
+                                    if(stateTimes.size() == 2) {
+                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop);
+                                    }
                                 } else {
                                     robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
-                                    robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+
+                                    if(stateTimes.size() == 2) {
+                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+                                    }
                                 }
 
 
@@ -411,13 +432,23 @@ public class StateTeleOp extends LinearOpMode {
                                         stateTimes.add(stateTime.milliseconds());
                                         tempLastPosition = robot.lifter.currentClawPosition;
 
-                                        robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen); // USED TO BE CLAW FULL OPEN AS OF 2/1/2024
+                                        if(X1 || B1) {
+                                            robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen);
+                                        } else {
+                                            robot.lifter.claw.setPosition(Constants.ClawConstants.clawFullOpen);
+                                        }
+
                                     }
                                 }
 
                                 if(stateTimes.size() == 3) {
+
+                                    if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= 100) {
+                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd);
+                                    }
+
                                     if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS) + 1000) {
-                                        state = States.TRANSFER;
+                                        state = States.INTAKE;
 
                                         arm.setState(false);
 
@@ -430,6 +461,8 @@ public class StateTeleOp extends LinearOpMode {
                     break;
                 }
                 robot.update();
+
+                telemetry.addData("Sigma Gyatt?", FOD.getState());
             }
         }
     }
