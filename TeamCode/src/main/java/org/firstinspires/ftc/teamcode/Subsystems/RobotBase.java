@@ -37,9 +37,8 @@ public class RobotBase {
     public RobotBase(HardwareMap hardwareMap, boolean teleop) {
         this.hardwareMap = hardwareMap;
 
-        if(teleop) {
-            drive = new MecanumDrive(hardwareMap);
-        }
+        drive = new MecanumDrive(hardwareMap);
+
 
         lifter = new Lifter(hardwareMap);
         extend = new Extend(hardwareMap);

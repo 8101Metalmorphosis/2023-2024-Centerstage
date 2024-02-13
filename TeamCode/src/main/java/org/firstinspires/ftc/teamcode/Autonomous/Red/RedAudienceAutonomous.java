@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Extend;
 import org.firstinspires.ftc.teamcode.Vision.RedPipeline;
 import org.firstinspires.ftc.teamcode.Subsystems.RobotBase;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -72,9 +73,9 @@ public class RedAudienceAutonomous extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d(-56, -26))
                 .build();
 
-//        Trajectory rightSpike = drive.trajectoryBuilder(traj1.end())
-//
-//                .build();
+        Trajectory rightSpike = drive.trajectoryBuilder(traj1.end())
+                .lineToConstantHeading(new Vector2d(-42, -34))
+                .build();
 
 
         int spike = 2;
@@ -107,12 +108,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
             drive.followTrajectory(traj1);
             robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
 
-            if(spike == 1) {
+            if (spike == 1) {
                 drive.followTrajectory(leftSpike);
             } else if (spike == 2) {
                 drive.followTrajectory(middleSpike);
             } else if (spike == 3) {
-
+                drive.followTrajectory(rightSpike);
             }
 
             Trajectory traj2 = drive.trajectoryBuilder(drive.getPoseEstimate())
@@ -138,16 +139,11 @@ public class RedAudienceAutonomous extends LinearOpMode {
             sleep(100);
             robot.setIntake(0);
             robot.setExtendArm(Constants.ExtendConstants.resetExtendArm);
+            robot.setLifterWristRoll(Constants.ClawConstants.wristRollVertical);
 
 
             Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
-                    .back(20)
-                    .build();
-
-            if(spike == 1) {
-                traj4 = drive.trajectoryBuilder(traj3.end(), true)
-                        .splineToConstantHeading(new Vector2d(45.5, -28), Math.toRadians(-45))
-                        .addDisplacementMarker(4, () -> {
+                    .addDisplacementMarker(4, () -> {
                             robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
                         })
                         .addDisplacementMarker(10, () -> {
@@ -167,44 +163,121 @@ public class RedAudienceAutonomous extends LinearOpMode {
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
                             robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                         })
-                        .build();
-            } else if (spike == 2) {
-                traj4 = drive.trajectoryBuilder(traj3.end(), true)
-                        .splineToConstantHeading(new Vector2d(45.5, -33), Math.toRadians(-45))
-                        .addDisplacementMarker(4, () -> {
-                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
-                        })
-                        .addDisplacementMarker(10, () -> {
-                            robot.extend.openIntakeDoor();
-                            robot.lifter.clawOpen();
-                        })
-                        .addDisplacementMarker(15, () -> {
-                            robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
-                        })
-                        .addDisplacementMarker(45, () -> {
-                            robot.lifter.clawClose();
-                        })
-                        .addDisplacementMarker(55, () -> {
-                            robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
-                        })
-                        .addDisplacementMarker(60, () -> {
-                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
-                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
-                        })
-                        .build();
-            }
-            sleep(100);
-            drive.followTrajectory(traj4);
-            robot.extend.closeIntakeDoor();
-            sleep(250);
-            robot.lifter.clawOpen();
-            sleep(250);
-            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd - .05f);
-            sleep(250);
-            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
-            robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
-            sleep(10000);
+                    .splineToConstantHeading(new Vector2d(28, -12), Math.toRadians(0))
+                    .build();
 
+            drive.followTrajectory(traj4);
+
+            while(opModeIsActive()) {
+                drive.update();
+
+                robot.drive.findTargetTag(5);
+            }
+
+//            if(spike == 1) {
+//                traj4 = drive.trajectoryBuilder(traj3.end(), true)
+//                        .splineToConstantHeading(new Vector2d(24, -12), Math.toRadians(0))
+//                        .splineToConstantHeading(new Vector2d(45.5, -28), Math.toRadians(-45))
+//                        .addDisplacementMarker(4, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+//                        })
+//                        .addDisplacementMarker(10, () -> {
+//                            robot.extend.openIntakeDoor();
+//                            robot.lifter.clawOpen();
+//                        })
+//                        .addDisplacementMarker(15, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+//                        })
+//                        .addDisplacementMarker(45, () -> {
+//                            robot.lifter.clawClose();
+//                        })
+//                        .addDisplacementMarker(55, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+//                        })
+//                        .addDisplacementMarker(60, () -> {
+//                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+//                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
+//                        })
+//                        .build();
+//            } else if (spike == 2) {
+//                traj4 = drive.trajectoryBuilder(traj3.end(), true)
+//                        .splineToConstantHeading(new Vector2d(24, -12), Math.toRadians(0))
+//                        .splineToConstantHeading(new Vector2d(45.5, -33), Math.toRadians(-45))
+//                        .addDisplacementMarker(4, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+//                        })
+//                        .addDisplacementMarker(10, () -> {
+//                            robot.extend.openIntakeDoor();
+//                            robot.lifter.clawOpen();
+//                        })
+//                        .addDisplacementMarker(15, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+//                        })
+//                        .addDisplacementMarker(45, () -> {
+//                            robot.lifter.clawClose();
+//                        })
+//                        .addDisplacementMarker(55, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+//                        })
+//                        .addDisplacementMarker(60, () -> {
+//                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+//                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
+//                        })
+//                        .build();
+//            }  else if (spike == 3) {
+//                traj4 = drive.trajectoryBuilder(traj3.end(), true)
+//                        .splineToConstantHeading(new Vector2d(24, -12), Math.toRadians(0))
+//                        .splineToConstantHeading(new Vector2d(45.5, -42), Math.toRadians(0))
+//                        .addDisplacementMarker(4, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+//                        })
+//                        .addDisplacementMarker(10, () -> {
+//                            robot.extend.openIntakeDoor();
+//                            robot.lifter.clawOpen();
+//                        })
+//                        .addDisplacementMarker(15, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+//                        })
+//                        .addDisplacementMarker(45, () -> {
+//                            robot.lifter.clawClose();
+//                        })
+//                        .addDisplacementMarker(55, () -> {
+//                            robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+//                        })
+//                        .addDisplacementMarker(60, () -> {
+//                            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+//                            robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
+//                        })
+//                        .build();
+//            }
+
+//            sleep(100);
+//            drive.followTrajectory(traj4);
+//            robot.extend.closeIntakeDoor();
+//            sleep(250);
+//            robot.lifter.clawOpen();
+//            sleep(100);
+//            robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd - .05f);
+//            sleep(250);
+//            robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+//            robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm);
+//            Trajectory traj5 = drive.trajectoryBuilder(traj4.end())
+//                    .addDisplacementMarker(4, () -> {
+//                        robot.setLifterWristRoll(Constants.ClawConstants.wristRollVertical);
+//                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchTransfer);
+//                        robot.setExtendArm(Constants.ExtendConstants.stackIntake4);
+//                    })
+//                    .addDisplacementMarker(8, () -> {
+//                        robot.setLifterArm(Constants.LifterConstants.liftArmIntake);
+//                    })
+//                    .splineToConstantHeading(new Vector2d(24, -12), Math.toRadians(179.9))
+//                    .addDisplacementMarker(20, () -> {
+//                        robot.setIntake(1);
+//                    })
+//                    .splineToConstantHeading(new Vector2d(traj3.end().getX(), traj3.end().getY()), Math.toRadians(179.9))
+//                    .build();
+//            drive.followTrajectory(traj5);
+//            sleep(500);
 
         }
     }

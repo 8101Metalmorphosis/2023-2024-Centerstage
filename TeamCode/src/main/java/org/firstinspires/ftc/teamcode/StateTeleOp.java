@@ -136,12 +136,14 @@ public class StateTeleOp extends LinearOpMode {
             stateTime.reset();
             firstState = true;
 
+            robot.drive.setManualExposure(25, 8);
+
             while(opModeIsActive()) {
 
                 updateInputs();
 
                 // Controls
-                FOD.update(START1);
+                alignAprilTag.update(START1);
 
                 arm.update(Y1);
 
@@ -397,13 +399,14 @@ public class StateTeleOp extends LinearOpMode {
                                 // MANUAL CONTROLS
                                 // Lifter Controls
 
+                                if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
+                                    robot.setLifter(
+                                            (int) MathUtil.putInRange(Constants.LifterConstants.lifterMinHeight,
+                                                    (int) (((double) (RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition)),
+                                                    Constants.LifterConstants.lifterMaxHeight));
+                                }
+
                                 if(!arm.getState()) {
-                                    if (!MathUtil.isInRange(LEFTTRIGGER1, Constants.OtherConstants.joystickThreshold) || !MathUtil.isInRange(RIGHTTRIGGER1, Constants.OtherConstants.joystickThreshold)) {
-                                        robot.setLifter(
-                                                (int) MathUtil.putInRange(Constants.LifterConstants.lifterMinHeight,
-                                                        (int) (((double) (RIGHTTRIGGER1 - LEFTTRIGGER1) * Constants.LifterConstants.maxTicksPerLoop) + (robot.lifter.currentLiftPosition)),
-                                                        Constants.LifterConstants.lifterMaxHeight));
-                                    }
                                     robot.setLifterArm(Constants.LifterConstants.liftArmTop);
                                     if(stateTimes.size() == 2) {
                                         robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop);

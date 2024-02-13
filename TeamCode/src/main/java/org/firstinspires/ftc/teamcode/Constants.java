@@ -42,7 +42,7 @@ public class Constants {
 
         // GUESSES
         public static float stackIntake5 = .19f;
-        public static float stackIntake4 = .17f;
+        public static float stackIntake4 = .16f;
         public static float stackIntake3 = .15f;
         public static float stackIntake2 = .14f;
 
