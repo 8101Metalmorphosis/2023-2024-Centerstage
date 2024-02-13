@@ -126,12 +126,6 @@ public class MecanumDrive {
             if (detection.metadata != null) {
                 if (detection.id == targetTagID) {
                     alignToTag(detection);
-
-                    if(MathUtil.isInRange(detection.ftcPose.range, 10)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
                 }
             } else {
                 FrontLeft.setPower(0);
@@ -149,6 +143,22 @@ public class MecanumDrive {
         }
 
         return false;
+    }
+
+    public AprilTagDetection getScannedTag(int targetTagID) {
+        currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == targetTagID) {
+                    return detection;
+                }
+            }
+        }
+
+        if(currentDetections.size() == 0) {
+            return null;
+        }
     }
 
     public void alignToTag(AprilTagDetection detection) {

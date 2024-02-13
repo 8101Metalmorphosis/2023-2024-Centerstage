@@ -97,5 +97,16 @@ public class Constants {
         public static final int ID_REDALLIANCE_LEFT = 4;
         public static final int ID_REDALLIANCE_CENTER = 5;
         public static final int ID_REDALLIANCE_RIGHT = 6;
+
+        
+        public static final Hashmap<Integer, Integer> spikeToAprilTagRED = new HashMap<Integer, Integer>();
+        spikeToAprilTagRED.put(1, ID_REDALLIANCE_LEFT);
+        spikeToAprilTagRED.put(2, ID_REDALLIANCE_MIDDLE);
+        spikeToAprilTagRED.put(3, ID_REDALLIANCE_RIGHT);
+
+        public static final Hashmap<Integer, Integer> spikeToAprilTagBlue = new HashMap<Integer, Integer>();
+        spikeToAprilTagRED.put(1, ID_BLUEALLIANCE_LEFT);
+        spikeToAprilTagRED.put(2, ID_BLUEALLIANCE_MIDDLE);
+        spikeToAprilTagRED.put(3, ID_BLUEALLIANCE_RIGHT);
     }
 }
