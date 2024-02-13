@@ -163,16 +163,22 @@ public class RedAudienceAutonomous extends LinearOpMode {
                             robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
                             robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                         })
-                    .splineToConstantHeading(new Vector2d(28, -12), Math.toRadians(0))
+                    .splineToLinearHeading(new Pose2d(28, -12, Math.toRadians(-45)), Math.toRadians(0))
                     .build();
 
             drive.followTrajectory(traj4);
 
-            while(opModeIsActive()) {
-                drive.update();
+            boolean autoTargetFlag = true;
 
-                robot.drive.findTargetTag(5);
+            while(autoTargetFlag) {
+                autoTargetFlag = robot.drive.findTargetTag(5);
             }
+
+//            while(opModeIsActive()) {
+//                drive.update();
+//
+//                robot.drive.findTargetTag(5);
+//            }
 
 //            if(spike == 1) {
 //                traj4 = drive.trajectoryBuilder(traj3.end(), true)

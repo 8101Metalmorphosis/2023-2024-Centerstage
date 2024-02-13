@@ -119,13 +119,19 @@ public class MecanumDrive {
         BackRight.setPower((LY + LX - RX));
     }
 
-    public void findTargetTag(int targetTagID) {
+    public boolean findTargetTag(int targetTagID) {
         currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
                 if (detection.id == targetTagID) {
                     alignToTag(detection);
+
+                    if(MathUtil.isInRange(detection.ftcPose.range, 10)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             } else {
                 FrontLeft.setPower(0);
@@ -141,6 +147,8 @@ public class MecanumDrive {
             BackLeft.setPower(0);
             BackRight.setPower(0);
         }
+
+        return false;
     }
 
     public void alignToTag(AprilTagDetection detection) {
