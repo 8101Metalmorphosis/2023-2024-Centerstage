@@ -119,7 +119,7 @@ public class MecanumDrive {
         BackRight.setPower((LY + LX - RX));
     }
 
-    public boolean findTargetTag(int targetTagID) {
+    public boolean alignToTargetTag(int targetTagID) {
         currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {

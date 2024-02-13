@@ -39,12 +39,10 @@ public class Constants {
         public static float intakeExtendArm = .1f;
         public static float resetExtendArm = .8f;
 
-
-        // GUESSES
         public static float stackIntake5 = .19f;
         public static float stackIntake4 = .16f;
-        public static float stackIntake3 = .15f;
-        public static float stackIntake2 = .14f;
+        public static float stackIntake3 = .15f; // Guess
+        public static float stackIntake2 = .14f; // Guess
 
     }
 
