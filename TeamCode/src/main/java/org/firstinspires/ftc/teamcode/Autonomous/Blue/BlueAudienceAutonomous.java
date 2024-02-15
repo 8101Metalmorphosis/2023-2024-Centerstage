@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.Autonomous.Red;
+package org.firstinspires.ftc.teamcode.Autonomous.Blue;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,15 +10,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.FTCutil.MathUtil;
+import org.firstinspires.ftc.teamcode.Subsystems.Extend;
+import org.firstinspires.ftc.teamcode.Vision.BluePipeline;
 import org.firstinspires.ftc.teamcode.Vision.RedPipeline;
 import org.firstinspires.ftc.teamcode.Subsystems.RobotBase;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "Red Audience Autonomous", group = "! a")
-public class RedAudienceAutonomous extends LinearOpMode {
+@Autonomous(name = "Blue Audience Autonomous", group = "! a")
+public class BlueAudienceAutonomous extends LinearOpMode {
 
 
     RobotBase robot;
@@ -48,7 +52,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                         "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        RedPipeline detector = new RedPipeline(telemetry);
+        BluePipeline detector = new BluePipeline(telemetry);
         webcam.setPipeline(detector);
 
 
@@ -67,42 +71,45 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Pose2d startPose = new Pose2d(-40, -63, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-32, 63, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
 
         Trajectory left = drive.trajectoryBuilder(startPose)
-                .addDisplacementMarker(4, () -> {
+                .addDisplacementMarker(1, () -> {
                     robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm + .04f);
                 })
-                .lineToLinearHeading(new Pose2d(-47.5, -16, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(-47.5, 16, Math.toRadians(90)))
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(startPose)
-                .addDisplacementMarker(4, () -> {
+                .addDisplacementMarker(1, () -> {
                     robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm + .04f);
                 })
-                .lineToLinearHeading(new Pose2d(-46, -13, Math.toRadians(-45)))
+                .lineToLinearHeading(new Pose2d(-48, 13, Math.toRadians(45)))
                 .build();
 
         Trajectory right = drive.trajectoryBuilder(startPose)
-                .addDisplacementMarker(4, () -> {
+                .addDisplacementMarker(1, () -> {
                     robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm + .04f);
                 })
-                .lineToLinearHeading(new Pose2d(-41, -34, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-41, 34, Math.toRadians(0)))
                 .build();
 
 
         Trajectory traj1 = drive.trajectoryBuilder(middle.end())
                 .addDisplacementMarker(1, () -> {
                     robot.setIntake(Constants.IntakeConstants.intakeSpeed);
-                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5 + .04f);
+                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5 + .075f);
                 })
-                .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180 - 1e-6)))
+                .lineToLinearHeading(new Pose2d(-50, 12, Math.toRadians(180 - 1e-6)))
                 .build();
 
 
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                .addDisplacementMarker(0, () -> {
+                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5 + .04f);
+                })
                 .forward(2.25)
                 .build();
 
@@ -133,7 +140,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                     robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
                     robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                 })
-                .splineToLinearHeading(new Pose2d(36, -22, Math.toRadians(170)), Math.toRadians(-30))
+                .splineToLinearHeading(new Pose2d(36, 22, Math.toRadians(-160)), Math.toRadians(30))
                 .build();
 
 
@@ -175,15 +182,15 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
 
         if(spike == 1) {
-            mainTag = 4;
+            mainTag = 1;
             currentState = State.LEFT;
             drive.followTrajectoryAsync(left);
         } else if (spike == 2) {
-            mainTag = 5;
+            mainTag = 2;
             currentState = State.MIDDLE;
             drive.followTrajectoryAsync(middle);
         } else if (spike == 3) {
-            mainTag = 6;
+            mainTag = 3;
             currentState = State.RIGHT;
             drive.followTrajectoryAsync(right);
         }
@@ -204,12 +211,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
                     if(!drive.isBusy()) {
                         traj1 = drive.trajectoryBuilder(left.end())
-                        .addDisplacementMarker(1, () -> {
-                            robot.setIntake(Constants.IntakeConstants.intakeSpeed);
-                            robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
-                        })
-                        .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180 - 1e-6)))
-                        .build();
+                                .addDisplacementMarker(1, () -> {
+                                    robot.setIntake(Constants.IntakeConstants.intakeSpeed);
+                                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
+                                })
+                                .lineToLinearHeading(new Pose2d(-50, 12, Math.toRadians(180 - 1e-6)))
+                                .build();
 
                         stateTimer.reset();
                         currentState = State.OUTTAKE;
@@ -222,12 +229,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
                     if(!drive.isBusy()) {
                         traj1 = drive.trajectoryBuilder(middle.end())
-                        .addDisplacementMarker(1, () -> {
-                            robot.setIntake(Constants.IntakeConstants.intakeSpeed);
-                            robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
-                        })
-                        .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180 - 1e-6)))
-                        .build();
+                                .addDisplacementMarker(1, () -> {
+                                    robot.setIntake(Constants.IntakeConstants.intakeSpeed);
+                                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
+                                })
+                                .lineToLinearHeading(new Pose2d(-50, 12, Math.toRadians(180 - 1e-6)))
+                                .build();
 
                         stateTimer.reset();
                         currentState = State.OUTTAKE;
@@ -240,12 +247,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
                     if(!drive.isBusy()) {
                         traj1 = drive.trajectoryBuilder(right.end())
-                        .addDisplacementMarker(1, () -> {
-                            robot.setIntake(Constants.IntakeConstants.intakeSpeed);
-                            robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
-                        })
-                        .lineToLinearHeading(new Pose2d(-50, -12, Math.toRadians(180 - 1e-6)))
-                        .build();
+                                .addDisplacementMarker(1, () -> {
+                                    robot.setIntake(Constants.IntakeConstants.intakeSpeed);
+                                    robot.setExtendArm(Constants.ExtendConstants.stackIntake5);
+                                })
+                                .lineToLinearHeading(new Pose2d(-50, 12, Math.toRadians(180 - 1e-6)))
+                                .build();
 
                         stateTimer.reset();
                         currentState = State.OUTTAKE;
@@ -302,7 +309,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
                 case AUTO_TARGET_1:
 
-                    if(spike == 1 || spike == 2) {
+                    if(spike == 1) {
                         robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                     } else {
                         robot.setLifterWristRoll(Constants.ClawConstants.wristRollLeft);
@@ -324,21 +331,22 @@ public class RedAudienceAutonomous extends LinearOpMode {
                             stateTimer.reset();
 
                             if(mainTag == 4) {
-                                drive.setPoseEstimate(new Pose2d(44, -28, Math.toRadians(175)));
+                                drive.setPoseEstimate(new Pose2d(44, 28, Math.toRadians(-175)));
                             } else if (mainTag == 5) {
-                                drive.setPoseEstimate(new Pose2d(44, -32, Math.toRadians(175)));
+                                drive.setPoseEstimate(new Pose2d(44, 32, Math.toRadians(-175)));
                             } else {
-                                drive.setPoseEstimate(new Pose2d(44, -42, Math.toRadians(175)));
+                                drive.setPoseEstimate(new Pose2d(44, 42, Math.toRadians(-175)));
                             }
 
                             park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                                    .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
+                                    .splineToLinearHeading(new Pose2d(56, 12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
                                     .build();
                             drive.followTrajectoryAsync(park);
                             currentState = State.PARK;
                         }
                     }
-//                    else if (stateTimer.milliseconds() >= 12000) {
+//                    else if (stateTimer.milliseconds() >= 12000) {]\
+
 //                      autoTargeting = false;
 //                      stateTimer.reset();
 ////                      drive.followTrajectoryAsync(park);
@@ -359,12 +367,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
                         }
                     }
 
-                  if(!drive.isBusy()) {
-                    stateTimer.reset();
-                    currentState = State.IDLE;
-                  }
+                    if(!drive.isBusy()) {
+                        stateTimer.reset();
+                        currentState = State.IDLE;
+                    }
 
-                  break;
+                    break;
 
                 case IDLE:
                     break;

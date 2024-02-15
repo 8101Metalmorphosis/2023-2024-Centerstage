@@ -64,10 +64,6 @@ public class MecanumDrive {
         BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         BackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        initAprilTag(hardwareMap);
-        visionPortal.resumeStreaming();
-        visionPortal.resumeLiveView();
     }
 
     public void update() {
@@ -156,16 +152,28 @@ public class MecanumDrive {
             }
         }
 
-        if(currentDetections.size() == 0) {
-            return null;
+        return null;
+    }
+
+    public boolean scanForTag(int targetTagID) {
+        currentDetections = aprilTag.getDetections();
+
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                if (detection.id == targetTagID) {
+                    return true;
+                }
+            }
         }
+
+        return false;
     }
 
     public void alignToTag(AprilTagDetection detection) {
         double targetDistance = 9;
 
         double DISTANCE_GAIN = 0.036;
-        double STRAFE_GAIN = 0.02;
+        double STRAFE_GAIN = 0.025;
         double TURN_GAIN = 0.025;
 
         double MAX_DRIVE_SPEED = .4;
@@ -190,7 +198,7 @@ public class MecanumDrive {
         BackRight.setPower(-rangeValue + yawValue + headingValue);
     }
 
-    private void initAprilTag(HardwareMap hardwareMap) {
+    public void initAprilTag(HardwareMap hardwareMap) {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
@@ -246,6 +254,13 @@ public class MecanumDrive {
 
     }
 
+    public void setZero() {
+        FrontLeft.setPower(0);
+        FrontRight.setPower(0);
+        BackLeft.setPower(0);
+        BackRight.setPower(0);
+    }
+
     public void setManualExposure(int exposureMS, int gain) {
         // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
         ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
@@ -257,5 +272,10 @@ public class MecanumDrive {
         // Set Gain.
         GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
         gainControl.setGain(gain);
+    }
+
+    public void startAprilTags() {
+        visionPortal.resumeStreaming();
+        visionPortal.resumeLiveView();
     }
 }

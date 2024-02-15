@@ -36,8 +36,8 @@ public class RedPipeline extends OpenCvPipeline {
     );
 
     static final Rect MIDDLE = new Rect(
-        new Point(0, 50),
-        new Point(280, 300)
+        new Point(0, 100),
+        new Point(280, 350)
     );
 
     @Override

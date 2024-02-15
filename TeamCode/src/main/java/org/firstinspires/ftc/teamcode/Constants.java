@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import java.util.HashMap;
+
 public class Constants {
 
     public static class OtherConstants {
@@ -67,7 +69,7 @@ public class Constants {
         public static float wristRollRightHalf = .35f;
 
         public static float clawFullOpen = .1f;
-        public static float clawOpen = .25f;
+        public static float clawOpen = .225f;
         public static float clawClose = .7f;
     }
 
@@ -95,16 +97,5 @@ public class Constants {
         public static final int ID_REDALLIANCE_LEFT = 4;
         public static final int ID_REDALLIANCE_CENTER = 5;
         public static final int ID_REDALLIANCE_RIGHT = 6;
-
-        
-        public static final Hashmap<Integer, Integer> spikeToAprilTagRED = new HashMap<Integer, Integer>();
-        spikeToAprilTagRED.put(1, ID_REDALLIANCE_LEFT);
-        spikeToAprilTagRED.put(2, ID_REDALLIANCE_MIDDLE);
-        spikeToAprilTagRED.put(3, ID_REDALLIANCE_RIGHT);
-
-        public static final Hashmap<Integer, Integer> spikeToAprilTagBlue = new HashMap<Integer, Integer>();
-        spikeToAprilTagRED.put(1, ID_BLUEALLIANCE_LEFT);
-        spikeToAprilTagRED.put(2, ID_BLUEALLIANCE_MIDDLE);
-        spikeToAprilTagRED.put(3, ID_BLUEALLIANCE_RIGHT);
     }
 }

@@ -113,6 +113,8 @@ public class StateTeleOp extends LinearOpMode {
 
         robot.lifter.zeroArm();
 
+        robot.drive.initAprilTag(hardwareMap);
+
         while(opModeInInit()) {
 
             robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
@@ -425,6 +427,10 @@ public class StateTeleOp extends LinearOpMode {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeft);
                                 } else if (B1) {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRight);
+                                } else if (LEFTBUMPER1) {
+                                    robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollLeftHalf);
+                                } else if (RIGHTBUMPER1){
+                                    robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollRightHalf);
                                 } else {
                                     robot.lifter.setWristRollPosition(Constants.ClawConstants.wristRollVertical);
                                 }
@@ -447,7 +453,7 @@ public class StateTeleOp extends LinearOpMode {
                                 if(stateTimes.size() == 3) {
 
                                     if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= 100) {
-                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd);
+//                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2nd);
                                     }
 
                                     if(stateTime.milliseconds() - (double) (stateTimes.get(2)) >= MathUtil.calculateTimeMS(tempLastPosition, robot.lifter.currentClawPosition, Constants.TimerConstants.clawTimeMS) + 1000) {
