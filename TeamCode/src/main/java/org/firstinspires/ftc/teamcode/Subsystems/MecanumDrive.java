@@ -141,6 +141,14 @@ public class MecanumDrive {
         return false;
     }
 
+    public Pose2d calculatePose(AprilTagDetection aprilTag, Vector2d aprilTagLocation) {
+        Pose2d calculatedPose = new Pose2d(
+            Math.cos(aprilTag.ftcPose.bearing) * aprilTag.ftcPose.y,
+            Math.cos(aprilTag.ftcPose.yaw) * aprilTag.ftcPose.x,
+            Math.toRadians(aprilTag.ftcPose.bearing - 180)
+        );
+    }
+
     public AprilTagDetection getScannedTag(int targetTagID) {
         currentDetections = aprilTag.getDetections();
 

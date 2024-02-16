@@ -223,14 +223,17 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
         if(spike == 1) {
             mainTag = 4;
+            tagY = -35.5f;
             currentState = State.LEFT;
             drive.followTrajectoryAsync(left);
         } else if (spike == 2) {
             mainTag = 5;
+            tagY = -42f;
             currentState = State.MIDDLE;
             drive.followTrajectoryAsync(middle);
         } else if (spike == 3) {
             mainTag = 6;
+            tagY = -48f;
             currentState = State.RIGHT;
             drive.followTrajectoryAsync(right);
         }
@@ -384,20 +387,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                             robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen);
 
 
-
-                            if(spike == 1) {
-                                tagY = -35.5f;
-                            } else if (spike == 2) {
-                                tagY = -42f;
-                            } else if (spike == 3) {
-                                tagY = -48f;
-                            }
-
-                            drive.setPoseEstimate(new Pose2d(
-                                    (62.5 - robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
-                                    (tagY - robot.drive.getScannedTag(mainTag).ftcPose.x) + .5,
-                                    Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
-                                ));
+                            drive.setPoseEstimate(robot.drive.calculatePose(robot.drive.getScannedTag(mainTag)), new Vector2d(62.5, tagY));
 
 
                             traj4 = drive.trajectoryBuilder(drive.getPoseEstimate())
@@ -419,11 +409,8 @@ public class RedAudienceAutonomous extends LinearOpMode {
                     }
                     else if (stateTimer.milliseconds() >= 12000) {
                         robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
-                        drive.setPoseEstimate(new Pose2d(
-                                (62.5 -  robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
-                                (tagY - robot.drive.getScannedTag(mainTag).ftcPose.x) - .5,
-                                Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
-                        ));
+
+                        drive.setPoseEstimate(robot.drive.calculatePose(robot.drive.getScannedTag(mainTag)), new Vector2d(62.5, tagY));
 
                         park = drive.trajectoryBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
@@ -516,11 +503,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
                             autoTargeting = false;
 
-                            drive.setPoseEstimate(new Pose2d(
-                                    (62.5 -  robot.drive.getScannedTag(4).ftcPose.y) - 8,
-                                    (tagY - robot.drive.getScannedTag(4).ftcPose.x) - .5,
-                                    Math.toRadians(robot.drive.getScannedTag(4).ftcPose.yaw - 180)
-                            ));
+                            drive.setPoseEstimate(robot.drive.calculatePose(robot.drive.getScannedTag(mainTag)), new Vector2d(62.5, tagY));
 
                             park = drive.trajectoryBuilder(drive.getPoseEstimate())
                                     .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
@@ -532,11 +515,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                         }
                     }
                     else if (stateTimer.milliseconds() >= 12000) {
-                        drive.setPoseEstimate(new Pose2d(
-                                (62.5 -  robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
-                                (-(42 - robot.drive.getScannedTag(mainTag).ftcPose.x) - .5),
-                                Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
-                        ));
+                        drive.setPoseEstimate(robot.drive.calculatePose(robot.drive.getScannedTag(mainTag)), new Vector2d(62.5, tagY));
 
                         park = drive.trajectoryBuilder(drive.getPoseEstimate())
                                 .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
@@ -574,6 +553,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                 drive.update();
             }
         }
+
     }
 }
 
