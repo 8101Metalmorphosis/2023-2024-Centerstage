@@ -173,8 +173,8 @@ public class MecanumDrive {
         double targetDistance = 9;
 
         double DISTANCE_GAIN = 0.036;
-        double STRAFE_GAIN = 0.025;
-        double TURN_GAIN = 0.025;
+        double STRAFE_GAIN = 0.1;
+        double TURN_GAIN = 0.1;
 
         double MAX_DRIVE_SPEED = .4;
         double MAX_STRAFE_SPEED = .2;

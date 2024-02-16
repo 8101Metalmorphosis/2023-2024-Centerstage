@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -26,6 +27,9 @@ public class RobotBase {
     public Lifter lifter;
     public Extend extend;
 
+
+    public Servo drone;
+
     public double imuYawOffset = 0;
 
     double imuYaw = 0;
@@ -45,6 +49,8 @@ public class RobotBase {
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        drone = hardwareMap.get(Servo.class, "drone");
 
         imu.initialize(new BNO055IMU.Parameters());
 

@@ -50,6 +50,7 @@ public class StateTeleOp extends LinearOpMode {
     boolean DPAD_UP1;
     boolean DPAD_LEFT1;
     boolean DPAD_DOWN1;
+    boolean DPAD_RIGHT1;
 
     boolean START1;
 
@@ -115,6 +116,8 @@ public class StateTeleOp extends LinearOpMode {
 
         robot.drive.initAprilTag(hardwareMap);
 
+        robot.drone.setPosition(.5);
+
         while(opModeInInit()) {
 
             robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
@@ -129,6 +132,8 @@ public class StateTeleOp extends LinearOpMode {
                 robot.lifter.resetArm();
                 firstState = false;
             }
+
+            telemetry.addLine("Ready");
         }
 
         robot.lifter.resetArm();
@@ -149,6 +154,9 @@ public class StateTeleOp extends LinearOpMode {
 
                 arm.update(Y1);
 
+                if(DPAD_RIGHT1) {
+                    robot.drone.setPosition(.25);
+                }
 
                 // Update Robot
                 robot.updateDrive(LY1, LX1, RX1 * turnMultiplier, FOD.getState(), false, alignAprilTag.getState(), antiTip);
@@ -502,6 +510,7 @@ public class StateTeleOp extends LinearOpMode {
         DPAD_UP1 = gamepad1.dpad_up;
         DPAD_LEFT1 = gamepad1.dpad_left;
         DPAD_DOWN1 = gamepad1.dpad_down;
+        DPAD_RIGHT1 = gamepad1.dpad_right;
 
 
         // Gamepad 2

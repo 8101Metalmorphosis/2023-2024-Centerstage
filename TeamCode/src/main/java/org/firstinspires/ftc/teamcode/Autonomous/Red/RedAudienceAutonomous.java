@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Red;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,7 +34,12 @@ public class RedAudienceAutonomous extends LinearOpMode {
         TRAJECTORY_1,
         TRAJECTORY_2,
         TRAJECTORY_3,
+        RIGHT_2,
         AUTO_TARGET_1,
+        TRAJECTORY_4,
+        TRAJECTORY_5,
+        TRAJECTORY_6,
+        AUTO_TARGET_2,
         PARK,
         IDLE
     }
@@ -75,7 +81,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
                 .addDisplacementMarker(4, () -> {
                     robot.setExtendArm(Constants.ExtendConstants.intakeExtendArm + .04f);
                 })
-                .lineToLinearHeading(new Pose2d(-47.5, -16, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(-46, -16, Math.toRadians(-90)))
                 .build();
 
         Trajectory middle = drive.trajectoryBuilder(startPose)
@@ -133,9 +139,49 @@ public class RedAudienceAutonomous extends LinearOpMode {
                     robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
                     robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
                 })
-                .splineToLinearHeading(new Pose2d(36, -22, Math.toRadians(170)), Math.toRadians(-30))
+                .splineToLinearHeading(new Pose2d(35, -18, Math.toRadians(158)), Math.toRadians(-15))
                 .build();
 
+        Trajectory right2 = drive.trajectoryBuilder(traj3.end())
+                .lineToLinearHeading(new Pose2d(36, -32, Math.toRadians(155)))
+                .build();
+
+        Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
+                .splineToLinearHeading(new Pose2d(36, -14, Math.toRadians(180 + 1e-6)), Math.toRadians(180 + 1e-6))
+                .build();
+
+        Trajectory traj5 = drive.trajectoryBuilder(traj4.end())
+                .splineToLinearHeading(new Pose2d(-52, -14, Math.toRadians(180 + 1e-6)), Math.toRadians(180 + 1e-6))
+                .build();
+
+        Trajectory traj6 = drive.trajectoryBuilder(traj5.end(), true)
+                .addDisplacementMarker(1, () -> {
+                    robot.setIntake(0);
+                })
+                .addDisplacementMarker(1, () -> {
+                    robot.setExtendArm(Constants.ExtendConstants.resetExtendArm);
+                })
+                .addDisplacementMarker(10, () -> {
+                    robot.lifter.clawOpen();
+                })
+                .addDisplacementMarker(19, () -> {
+                    robot.extend.openIntakeDoor();
+                })
+                .addDisplacementMarker(19, () -> {
+                    robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+                })
+                .addDisplacementMarker(45, () -> {
+                    robot.lifter.clawClose();
+                })
+                .addDisplacementMarker(55, () -> {
+                    robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+                })
+                .addDisplacementMarker(60, () -> {
+                    robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+                    robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
+                })
+                .splineToLinearHeading(new Pose2d(35, -18, Math.toRadians(158)), Math.toRadians(-15))
+                .build();
 
         Trajectory park = drive.trajectoryBuilder(traj3.end())
                 .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
@@ -145,6 +191,7 @@ public class RedAudienceAutonomous extends LinearOpMode {
 
         int spike = 2;
         int mainTag = 5;
+        float tagY = 42.5f;
 
 
         boolean autoTargeting = false;
@@ -295,8 +342,24 @@ public class RedAudienceAutonomous extends LinearOpMode {
                         stateTimer.reset();
                         currentState = State.AUTO_TARGET_1;
 
+                        if(spike == 3) {
+                            drive.followTrajectoryAsync(right2);
+                            currentState = State.RIGHT_2;
+                        }
+
                     }
 
+                    break;
+
+
+
+                case RIGHT_2:
+
+                    if(!drive.isBusy()) {
+                        stateTimer.reset();
+                        currentState = State.AUTO_TARGET_1;
+
+                    }
                     break;
 
 
@@ -320,33 +383,169 @@ public class RedAudienceAutonomous extends LinearOpMode {
                         if(MathUtil.isInRange(robot.drive.getScannedTag(mainTag).ftcPose.range, 10)) {
                             robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen);
 
+
+
+                            if(spike == 1) {
+                                tagY = -35.5f;
+                            } else if (spike == 2) {
+                                tagY = -42f;
+                            } else if (spike == 3) {
+                                tagY = -48f;
+                            }
+
+                            drive.setPoseEstimate(new Pose2d(
+                                    (62.5 - robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
+                                    (tagY - robot.drive.getScannedTag(mainTag).ftcPose.x) + .5,
+                                    Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
+                                ));
+
+
+                            traj4 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                                    .addDisplacementMarker(0, () -> {
+                                        robot.extend.closeIntakeDoor();
+                                    })
+                                    .addDisplacementMarker(6, () -> {
+                                        robot.setLifterArm(Constants.LifterConstants.liftArmIntake + .15f);
+                                        robot.extend.setArmPosition(Constants.ExtendConstants.intakeExtendArm);
+                                    })
+                                    .lineToLinearHeading(new Pose2d(24, -14, Math.toRadians(180 - 1e-6)))
+                                    .build();
+
                             autoTargeting = false;
                             stateTimer.reset();
+                            drive.followTrajectoryAsync(traj4);
+                            currentState = State.TRAJECTORY_4;
+                        }
+                    }
+                    else if (stateTimer.milliseconds() >= 12000) {
+                        robot.setLifterArm(Constants.LifterConstants.liftArmIdle);
+                        drive.setPoseEstimate(new Pose2d(
+                                (62.5 -  robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
+                                (tagY - robot.drive.getScannedTag(mainTag).ftcPose.x) - .5,
+                                Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
+                        ));
 
-                            if(mainTag == 4) {
-                                drive.setPoseEstimate(new Pose2d(44, -28, Math.toRadians(175)));
-                            } else if (mainTag == 5) {
-                                drive.setPoseEstimate(new Pose2d(44, -32, Math.toRadians(175)));
-                            } else {
-                                drive.setPoseEstimate(new Pose2d(44, -42, Math.toRadians(175)));
-                            }
+                        park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
+                                .build();
+                      autoTargeting = false;
+                      stateTimer.reset();
+                      drive.followTrajectoryAsync(park);
+                      currentState = State.PARK;
+                    }
+
+                    break;
+
+
+                case TRAJECTORY_4:
+                    if(!drive.isBusy()) {
+                        traj5 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                                .lineToLinearHeading(new Pose2d(-54, -14, Math.toRadians(-175)))
+                                .addDisplacementMarker(10, () -> {
+                                    robot.extend.setArmPosition(Constants.ExtendConstants.stackIntake5 + .075f);
+                                    robot.setIntake(Constants.IntakeConstants.intakeSpeed);
+                                })
+                                .build();
+                        stateTimer.reset();
+                        drive.followTrajectoryAsync(traj5);
+                        currentState = State.TRAJECTORY_5;
+                    }
+                    break;
+
+                case TRAJECTORY_5:
+                    if(stateTimer.milliseconds() >= 100) {
+                        robot.extend.setArmPosition(Constants.ExtendConstants.stackIntake4);
+                    }
+                    if(stateTimer.milliseconds() >= 400) {
+                            traj6 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+                                    .addDisplacementMarker(1, () -> {
+                                        robot.setIntake(0);
+                                    })
+                                    .addDisplacementMarker(1, () -> {
+                                        robot.setExtendArm(Constants.ExtendConstants.resetExtendArm);
+                                    })
+                                    .addDisplacementMarker(10, () -> {
+                                        robot.lifter.clawOpen();
+                                    })
+                                    .addDisplacementMarker(19, () -> {
+                                        robot.extend.openIntakeDoor();
+                                    })
+                                    .addDisplacementMarker(19, () -> {
+                                        robot.setLifterArm(Constants.LifterConstants.liftArmTransfer);
+                                    })
+                                    .addDisplacementMarker(45, () -> {
+                                        robot.lifter.clawClose();
+                                    })
+                                    .addDisplacementMarker(55, () -> {
+                                        robot.setLifterArm(Constants.LifterConstants.liftArmTop2);
+                                    })
+                                    .addDisplacementMarker(60, () -> {
+                                        robot.setLifterWristPitch(Constants.ClawConstants.wristPitchDrop2);
+                                        robot.setLifterWristRoll(Constants.ClawConstants.wristRollRight);
+                                    })
+                                    .splineToLinearHeading(new Pose2d(35, -18, Math.toRadians(158)), Math.toRadians(-15))
+                                    .build();
+                            stateTimer.reset();
+                            drive.followTrajectory(traj6);
+                            currentState = State.TRAJECTORY_6;
+                        }
+                    break;
+
+                case TRAJECTORY_6:
+                    if(!drive.isBusy()) {
+                        park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
+                                .build();
+                        stateTimer.reset();
+                        drive.followTrajectory(park);
+                        currentState = State.PARK;
+                    }
+
+                case AUTO_TARGET_2:
+                    autoTargeting = true;
+
+                    if(robot.drive.scanForTag(4)) {
+                        robot.drive.alignToTargetTag(4);
+                    } else {
+                        robot.drive.setZero();
+                    }
+
+                    if(robot.drive.scanForTag(4)) {
+                        if(MathUtil.isInRange(robot.drive.getScannedTag(4).ftcPose.range, 10)) {
+                            robot.lifter.claw.setPosition(Constants.ClawConstants.clawOpen);
+
+                            autoTargeting = false;
+
+                            drive.setPoseEstimate(new Pose2d(
+                                    (62.5 -  robot.drive.getScannedTag(4).ftcPose.y) - 8,
+                                    (tagY - robot.drive.getScannedTag(4).ftcPose.x) - .5,
+                                    Math.toRadians(robot.drive.getScannedTag(4).ftcPose.yaw - 180)
+                            ));
 
                             park = drive.trajectoryBuilder(drive.getPoseEstimate())
                                     .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
                                     .build();
+                            autoTargeting = false;
+                            stateTimer.reset();
                             drive.followTrajectoryAsync(park);
                             currentState = State.PARK;
                         }
                     }
-//                    else if (stateTimer.milliseconds() >= 12000) {
-//                      autoTargeting = false;
-//                      stateTimer.reset();
-////                      drive.followTrajectoryAsync(park);
-////                      currentState = State.PARK;
-//                    }
+                    else if (stateTimer.milliseconds() >= 12000) {
+                        drive.setPoseEstimate(new Pose2d(
+                                (62.5 -  robot.drive.getScannedTag(mainTag).ftcPose.y) - 8,
+                                (-(42 - robot.drive.getScannedTag(mainTag).ftcPose.x) - .5),
+                                Math.toRadians(robot.drive.getScannedTag(mainTag).ftcPose.yaw - 180)
+                        ));
 
-                    break;
-
+                        park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                                .splineToLinearHeading(new Pose2d(56, -12, Math.toRadians(180 + 1e-6)), Math.toRadians(0))
+                                .build();
+                        autoTargeting = false;
+                        stateTimer.reset();
+                        drive.followTrajectoryAsync(park);
+                        currentState = State.PARK;
+                    }
 
                 case PARK:
 
